@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  /* Definición de tokens de marca para habilitar bg-tps-canvas y text-tps-text */
+  --color-tps-canvas: #ffffff; /* Ajustar al valor hexadecimal exacto de tu diseño */
+  --color-tps-text: #1a1a1a;   /* Ajustar al valor hexadecimal exacto de tu diseño */
+  
+  /* Extensión de fuentes si es necesario */
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+@layer utilities {
+  .ink-stroke {
+    stroke-width: 1.5;
+    stroke: currentColor;
+    fill: none;
+  }
+  
+  .ink-stroke-thick {
+    stroke-width: 3;
+    stroke: currentColor;
+    fill: none;
+  }
+}
+
+body {
+  @apply bg-tps-canvas text-tps-text font-serif;
+  margin: 0;
+  padding: 0;
+}
