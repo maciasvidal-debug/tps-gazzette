@@ -114,6 +114,21 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
               <input type="text" className={inputClass} value={state.masthead.volume} onChange={e => handleChange('masthead', 'volume', e.target.value)} />
             </div>
           </div>
+
+          <div className="mt-4">
+            <label className={labelClass}>Theme Style (Vignettes)</label>
+            <select
+              className={inputClass}
+              value={state.vignetteStyle || 'classic'}
+              onChange={e => handleChange('vignetteStyle' as keyof GazzetteState, '', e.target.value)}
+            >
+              <option value="classic">Classic Scroll</option>
+              <option value="science">Scientific (Atoms)</option>
+              <option value="writing">Editorial (Quill)</option>
+              <option value="medical">Medical (Caduceus)</option>
+            </select>
+          </div>
+
           <div>
             <label className={labelClass}>Tags (csv)</label>
             <input type="text" className={inputClass} value={state.masthead.tags.join(', ')} onChange={e => handleChange('masthead', 'tags', e.target.value.split(',').map(s => s.trim()))} />
@@ -139,6 +154,18 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
             <input type="text" className={inputClass} value={state.featureStory.author} onChange={e => handleChange('featureStory', 'author', e.target.value)} />
           </div>
 
+
+          <div className="mt-4">
+            <label className={labelClass}>Drop Cap Style</label>
+            <select
+              className={inputClass}
+              value={state.dropCapStyle || 'classic'}
+              onChange={e => handleChange('dropCapStyle' as keyof GazzetteState, '', e.target.value)}
+            >
+              <option value="classic">Classic Typography</option>
+              <option value="ornamental">Ornamental (Floral/Vine)</option>
+            </select>
+          </div>
           <div className="mt-4">
             <label className={labelClass}>Paragraphs</label>
             {state.featureStory.paragraphs.map((p, i) => (
