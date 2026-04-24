@@ -9,8 +9,8 @@ function App() {
   const printRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(0.85);
 
-  const handleExportPdf = () => {
-    exportPdf(state);
+  const handleExportPdf = (mode: 'digital' | 'print' = 'digital') => {
+    exportPdf(state, mode);
   };
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2));

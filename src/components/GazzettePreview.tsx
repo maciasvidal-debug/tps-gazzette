@@ -30,24 +30,33 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
             </h1>
           </header>
 
-          {/* ASYMMETRICAL TOP LAYOUT 4:8 */}
-          <div className="grid grid-cols-12 gap-8 mb-8 flex-1">
+          {/* ASYMMETRICAL TOP LAYOUT */}
+          <div className={`grid gap-8 mb-8 flex-1 ${state.layoutTemplate === 'modern' ? 'grid-cols-1' : 'grid-cols-12'}`}>
+
             
-            {/* LEFT SIDEBAR (4 cols) */}
-            <aside className="col-span-4 flex flex-col gap-6">
+            {/* LEFT SIDEBAR */}
+            <aside className={`${state.layoutTemplate === 'modern' ? 'hidden' : 'col-span-4 flex flex-col gap-6'}`}>
+
               {/* Spotlight */}
               <div className="border-b-[1px] border-tps-text pb-6">
                 <div className="font-sans text-xs font-bold uppercase tracking-widest text-tps-text mb-4">Spotlight</div>
-                <img 
-                  src={state.spotlight.imageUrl} 
-                  alt="Spotlight"
-                  className={`w-full aspect-square object-cover mb-3 ${state.spotlight.grayscale ? 'grayscale' : ''}`}
+                <div className="w-full aspect-square overflow-hidden mb-3 bg-gray-100 flex items-center justify-center">
+                  <img
+                    src={state.spotlight.imageUrl}
+                    alt="Spotlight"
+                    className={`w-full h-full ${state.spotlight.grayscale ? 'grayscale' : ''}`}
+                    style={{
+                      objectFit: state.spotlight.fit || 'cover',
+                      objectPosition: state.spotlight.position || 'center',
+                      transform: `scale(${state.spotlight.scale || 1})`
+                    }}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null; 
                     target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22800%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22800%22%20height%3D%22800%22%20fill%3D%22%23eee%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%20font-size%3D%2224%22%20fill%3D%22%23999%22%3EImage%20Not%20Found%3C%2Ftext%3E%3C%2Fsvg%3E';
                   }}
                 />
+                </div>
                 <p className="font-serif text-xs italic text-gray-600 leading-snug">
                   {state.spotlight.caption}
                 </p>
@@ -86,11 +95,26 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
               </div>
             </aside>
 
-            {/* MAIN ARTICLE (8 cols) */}
-            <main className="col-span-8 border-l-[1px] border-tps-text pl-8">
+            {/* MAIN ARTICLE */}
+            <main className={`${state.layoutTemplate === 'modern' ? 'col-span-1 border-none pl-0' : 'col-span-8 border-l-[1px] border-tps-text pl-8'}`}>
+
               <div className="font-sans text-xs font-bold uppercase tracking-widest text-tps-text mb-4 flex items-center gap-3">
                 {state.featureStory.kicker} <Vignette className="w-16 h-4 text-[#7A6490]" style={state.vignetteStyle} />
               </div>
+              {state.layoutTemplate === 'modern' && state.spotlight.imageUrl && (
+                <div className="w-full h-64 overflow-hidden mb-8 bg-gray-100 flex items-center justify-center border-b-[3px] border-tps-primary pb-2">
+                  <img
+                    src={state.spotlight.imageUrl}
+                    alt="Spotlight"
+                    className={`w-full h-full ${state.spotlight.grayscale ? 'grayscale' : ''}`}
+                    style={{
+                      objectFit: state.spotlight.fit || 'cover',
+                      objectPosition: state.spotlight.position || 'center',
+                      transform: `scale(${state.spotlight.scale || 1})`
+                    }}
+                  />
+                </div>
+              )}
               <h2 className="font-serif text-5xl font-bold leading-tight text-tps-text mb-4">
                 {state.featureStory.headline}
               </h2>
@@ -98,7 +122,7 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
                 By {state.featureStory.author}
               </div>
               
-              <div className="columns-2 gap-8 font-serif text-sm leading-relaxed text-gray-800 editorial-text">
+              <div className={`gap-8 font-serif text-sm leading-relaxed text-gray-800 editorial-text ${state.layoutTemplate === 'modern' ? 'columns-3' : 'columns-2'}`}>
                 {state.featureStory.paragraphs.map((p, i) => {
                   if (i === 0) {
                     return (

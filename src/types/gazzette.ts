@@ -18,6 +18,9 @@ export interface SpotlightState {
   imageUrl: string;
   caption: string;
   grayscale: boolean;
+  scale?: number;
+  position?: 'center' | 'top' | 'bottom' | 'left' | 'right';
+  fit?: 'cover' | 'contain';
 }
 
 export interface QuoteState {
@@ -48,4 +51,5 @@ export interface GazzetteState {
   secondaryArticle2: SecondaryArticleState;
   vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
   dropCapStyle?: 'classic' | 'ornamental';
+  layoutTemplate?: 'classic' | 'modern' | 'visual';
 }
