@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { GazzetteState } from '../types/gazzette';
+import type { GazzetteState, SecondaryArticleState } from '../types/gazzette';
 
 interface EditorSidebarProps {
   state: GazzetteState;
@@ -38,6 +38,24 @@ const AccordionSection: React.FC<{
     </div>
   );
 };
+
+
+const ArticleEditor: React.FC<{
+  title: string;
+  article: SecondaryArticleState;
+  onChange: <F extends keyof SecondaryArticleState>(field: F, value: SecondaryArticleState[F]) => void;
+  inputClass: string;
+  className?: string;
+}> = ({ title, article, onChange, inputClass, className = '' }) => (
+  <div className={`p-4 bg-[#2C2D35] rounded ${className}`}>
+    <h4 className="font-bold text-[#E5E7EB] mb-3 text-sm">{title}</h4>
+    <div className="space-y-3">
+      <input type="text" placeholder="Kicker" className={inputClass} value={article.kicker} onChange={e => onChange('kicker', e.target.value)} />
+      <input type="text" placeholder="Headline" className={inputClass} value={article.headline} onChange={e => onChange('headline', e.target.value)} />
+      <textarea placeholder="Content" className={inputClass} rows={4} value={article.content} onChange={e => onChange('content', e.target.value)} />
+    </div>
+  </div>
+);
 
 export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState, resetState, onExportPdf }) => {
   const [openSection, setOpenSection] = useState<string | null>('masthead');
@@ -281,23 +299,19 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           isOpen={openSection === 'secondaryArticles'}
           onToggle={() => toggleSection('secondaryArticles')}
         >
-          <div className="mb-6 p-4 bg-[#2C2D35] rounded">
-            <h4 className="font-bold text-[#E5E7EB] mb-3 text-sm">Article 1 (Left)</h4>
-            <div className="space-y-3">
-              <input type="text" placeholder="Kicker" className={inputClass} value={state.secondaryArticle1.kicker} onChange={e => handleChange('secondaryArticle1', 'kicker', e.target.value)} />
-              <input type="text" placeholder="Headline" className={inputClass} value={state.secondaryArticle1.headline} onChange={e => handleChange('secondaryArticle1', 'headline', e.target.value)} />
-              <textarea placeholder="Content" className={inputClass} rows={4} value={state.secondaryArticle1.content} onChange={e => handleChange('secondaryArticle1', 'content', e.target.value)} />
-            </div>
-          </div>
-
-          <div className="p-4 bg-[#2C2D35] rounded">
-            <h4 className="font-bold text-[#E5E7EB] mb-3 text-sm">Article 2 (Right)</h4>
-            <div className="space-y-3">
-              <input type="text" placeholder="Kicker" className={inputClass} value={state.secondaryArticle2.kicker} onChange={e => handleChange('secondaryArticle2', 'kicker', e.target.value)} />
-              <input type="text" placeholder="Headline" className={inputClass} value={state.secondaryArticle2.headline} onChange={e => handleChange('secondaryArticle2', 'headline', e.target.value)} />
-              <textarea placeholder="Content" className={inputClass} rows={4} value={state.secondaryArticle2.content} onChange={e => handleChange('secondaryArticle2', 'content', e.target.value)} />
-            </div>
-          </div>
+          <ArticleEditor
+            title="Article 1 (Left)"
+            article={state.secondaryArticle1}
+            onChange={(field, value) => handleChange('secondaryArticle1', field, value)}
+            inputClass={inputClass}
+            className="mb-6"
+          />
+          <ArticleEditor
+            title="Article 2 (Right)"
+            article={state.secondaryArticle2}
+            onChange={(field, value) => handleChange('secondaryArticle2', field, value)}
+            inputClass={inputClass}
+          />
         </AccordionSection>
       </div>
 
