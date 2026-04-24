@@ -1,3 +1,4 @@
+// TODO: something
 import { useRef, useState } from 'react';
 import { useGazzetteState } from './hooks/useGazzetteState';
 import { EditorSidebar } from './components/EditorSidebar';

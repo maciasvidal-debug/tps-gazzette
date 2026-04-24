@@ -52,7 +52,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
     value: GazzetteState[S][F]
   ) => {
     updateState((draft) => {
-      (draft[section] as any)[field] = value;
+      draft[section][field] = value;
     });
   };
 
