@@ -46,10 +46,13 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
     setOpenSection(openSection === section ? null : section);
   };
 
-  const handleChange = (section: keyof GazzetteState, field: string, value: string | boolean | number | string[]) => {
+  const handleChange = <S extends keyof GazzetteState, F extends keyof GazzetteState[S]>(
+    section: S,
+    field: F,
+    value: GazzetteState[S][F]
+  ) => {
     updateState((draft) => {
-      // @ts-expect-error - dynamic key assignment
-      draft[section][field] = value;
+      (draft[section] as any)[field] = value;
     });
   };
 
