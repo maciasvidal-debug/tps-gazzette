@@ -64,18 +64,12 @@ export function useGazzetteState() {
   });
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }, 1000);
-
-    return () => {
-      clearTimeout(handler);
-    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
 
   const updateState = (updater: (draft: GazzetteState) => void | GazzetteState) => {
     setState((prev) => {
-      const nextState = structuredClone(prev);
+      const nextState = JSON.parse(JSON.stringify(prev));
       const result = updater(nextState);
       return result || nextState;
     });

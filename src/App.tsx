@@ -1,4 +1,3 @@
-// TODO: something
 import { useRef, useState } from 'react';
 import { useGazzetteState } from './hooks/useGazzetteState';
 import { EditorSidebar } from './components/EditorSidebar';
@@ -77,7 +76,7 @@ function App() {
         {/* Scrollable Preview Area */}
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#2C2D35] flex items-start justify-center p-8">
           <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}>
-            <GazzettePreview ref={printRef} state={state} />
+            <GazzettePreview ref={printRef} state={state} updateState={updateState} />
           </div>
         </div>
       </main>

@@ -7,20 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "test": "vitest",
     "preview": "vite preview"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.5.1",
     "@tailwindcss/vite": "^4.2.4",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "react-moveable": "^0.56.0"
   },
   "devDependencies": {
-    "vitest": "^3.0.0",
-    "jsdom": "^26.0.0",
-    "@testing-library/react": "^16.0.0",
-    "@testing-library/dom": "^10.0.0",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",

@@ -1,13 +1,26 @@
 import React, { forwardRef } from 'react';
-import type { GazzetteState } from '../types/gazzette';
+import type { GazzetteState, TransformState } from '../types/gazzette';
 import { Vignette } from './Vignette';
 import { MarkdownText } from './MarkdownText';
+import { MoveableWrapper } from './MoveableWrapper';
 
 interface PreviewProps {
   state: GazzetteState;
+  updateState?: (updater: (draft: GazzetteState) => void | GazzetteState) => void;
 }
 
-export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state }, ref) => {
+export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state, updateState }, ref) => {
+  const handleTransformChange = (id: string, transform: TransformState) => {
+    if (updateState) {
+      updateState(draft => {
+        if (!draft.transforms) draft.transforms = {};
+        draft.transforms[id] = transform;
+      });
+    }
+  };
+
+  const isFree = !!state.freeDesignMode;
+
   return (
     <div className="flex flex-col gap-12 items-center bg-transparent pb-16" ref={ref}>
       {/* PAGE 1: Front Cover / Main Story Start */}
@@ -17,18 +30,25 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
       >
         <div className="px-12 py-10 h-full flex flex-col">
           {/* MASTHEAD */}
-          <header className="mb-8 text-center border-b-[6px] border-tps-primary pb-6">
-            <div className="flex justify-between items-end mb-2 font-sans text-[10px] font-bold tracking-[0.2em] text-tps-text uppercase">
-              <span>{state.masthead.date}</span>
-              <span className="flex gap-4">
-                {state.masthead.tags.map(tag => <span key={tag}>{tag}</span>)}
-              </span>
-              <span>{state.masthead.volume}</span>
-            </div>
-            <h1 className="font-serif text-7xl font-bold tracking-normal text-tps-text mb-2 uppercase border-b-[1px] border-t-[1px] border-tps-text py-4 mt-4">
-              {state.masthead.title}
-            </h1>
-          </header>
+          <MoveableWrapper
+            id="masthead"
+            isActive={isFree}
+            initialTransform={state.transforms?.['masthead']}
+            onTransformChange={handleTransformChange}
+          >
+            <header className="mb-8 text-center border-b-[6px] border-tps-primary pb-6">
+              <div className="flex justify-between items-end mb-2 font-sans text-[10px] font-bold tracking-[0.2em] text-tps-text uppercase">
+                <span>{state.masthead.date}</span>
+                <span className="flex gap-4">
+                  {state.masthead.tags.map(tag => <span key={tag}>{tag}</span>)}
+                </span>
+                <span>{state.masthead.volume}</span>
+              </div>
+              <h1 className="font-serif text-7xl font-bold tracking-normal text-tps-text mb-2 uppercase border-b-[1px] border-t-[1px] border-tps-text py-4 mt-4">
+                {state.masthead.title}
+              </h1>
+            </header>
+          </MoveableWrapper>
 
           {/* ASYMMETRICAL TOP LAYOUT */}
           <div className={`grid gap-8 mb-8 flex-1 ${state.layoutTemplate === 'modern' ? 'grid-cols-1' : 'grid-cols-12'}`}>
