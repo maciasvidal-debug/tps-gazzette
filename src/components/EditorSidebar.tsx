@@ -5,7 +5,7 @@ interface EditorSidebarProps {
   state: GazzetteState;
   updateState: (updater: (draft: GazzetteState) => void) => void;
   resetState: () => void;
-  onExportPdf: () => void;
+  onExportPdf: (mode?: 'digital' | 'print') => void;
 }
 
 const AccordionSection: React.FC<{
@@ -41,6 +41,7 @@ const AccordionSection: React.FC<{
 
 export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState, resetState, onExportPdf }) => {
   const [openSection, setOpenSection] = useState<string | null>('masthead');
+  const [exportMode, setExportMode] = useState<'digital' | 'print'>('digital');
 
   const toggleSection = (section: string) => {
     setOpenSection(openSection === section ? null : section);
@@ -94,6 +95,19 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {/* GLOBAL SETTINGS */}
+        <div className="p-6 bg-[#1A1A1E] border-b border-[#2C2D35] mb-4">
+          <label className={labelClass}>Layout Template</label>
+          <select
+            className={inputClass}
+            value={state.layoutTemplate || 'classic'}
+            onChange={e => handleChange('layoutTemplate' as keyof GazzetteState, '', e.target.value)}
+          >
+            <option value="classic">Classic Academic</option>
+            <option value="modern">Modern Impact</option>
+            <option value="visual">Visual / Gallery</option>
+          </select>
+        </div>
         {/* MASTHEAD SECTION */}
         <AccordionSection
           title="Masthead"
@@ -204,6 +218,41 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
             <label className={labelClass}>Caption</label>
             <textarea className={inputClass} rows={2} value={state.spotlight.caption} onChange={e => handleChange('spotlight', 'caption', e.target.value)} />
           </div>
+          <div>
+            <label className={labelClass}>Image Fit</label>
+            <select
+              className={inputClass}
+              value={state.spotlight.fit || 'cover'}
+              onChange={e => handleChange('spotlight', 'fit', e.target.value)}
+            >
+              <option value="cover">Fill (Cover)</option>
+              <option value="contain">Fit (Contain)</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelClass}>Image Position</label>
+            <select
+              className={inputClass}
+              value={state.spotlight.position || 'center'}
+              onChange={e => handleChange('spotlight', 'position', e.target.value)}
+            >
+              <option value="center">Center</option>
+              <option value="top">Top</option>
+              <option value="bottom">Bottom</option>
+              <option value="left">Left</option>
+              <option value="right">Right</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelClass}>Image Zoom (Scale): {state.spotlight.scale || 1}x</label>
+            <input
+              type="range"
+              min="0.5" max="3" step="0.1"
+              className="w-full accent-[#ED6A5E]"
+              value={state.spotlight.scale || 1}
+              onChange={e => handleChange('spotlight', 'scale', parseFloat(e.target.value))}
+            />
+          </div>
           <label className="flex items-center gap-2 cursor-pointer mt-2">
             <input type="checkbox" className="accent-[#ED6A5E] bg-[#212126]" checked={state.spotlight.grayscale} onChange={e => handleChange('spotlight', 'grayscale', e.target.checked)} />
             <span className="text-[#8B8D98] text-sm">Force Grayscale</span>
@@ -252,9 +301,23 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
         </AccordionSection>
       </div>
 
-      <div className="p-4 bg-[#1A1A1E] border-t border-[#2C2D35] mt-auto">
+<div className="p-4 bg-[#1A1A1E] border-t border-[#2C2D35] mt-auto">
+        <div className="flex gap-2 mb-3">
+          <button
+            onClick={() => setExportMode('digital')}
+            className={`flex-1 py-1.5 text-xs font-bold rounded border ${exportMode === 'digital' ? 'bg-[#ED6A5E] text-white border-[#ED6A5E]' : 'bg-transparent text-[#8B8D98] border-[#343541] hover:border-[#4B4C56]'}`}
+          >
+            Digital (Links)
+          </button>
+          <button
+            onClick={() => setExportMode('print')}
+            className={`flex-1 py-1.5 text-xs font-bold rounded border ${exportMode === 'print' ? 'bg-[#ED6A5E] text-white border-[#ED6A5E]' : 'bg-transparent text-[#8B8D98] border-[#343541] hover:border-[#4B4C56]'}`}
+          >
+            Print (QR/Bleed)
+          </button>
+        </div>
         <button
-          onClick={onExportPdf}
+          onClick={() => onExportPdf(exportMode)} // We could pass mode here, but let's just trigger it. In reality we'd extend onExportPdf to take the mode.
           className="w-full bg-[#E5484D] hover:bg-[#F2555A] text-white py-3 px-4 rounded text-sm font-bold transition-colors flex items-center justify-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>

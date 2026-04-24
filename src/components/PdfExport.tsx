@@ -9,7 +9,8 @@ import {
   Image,
   pdf,
   Svg,
-  Path
+  Path,
+  Rect
 } from '@react-pdf/renderer';
 import type { GazzetteState } from '../types/gazzette';
 
@@ -315,7 +316,7 @@ const VignetteSvg = () => (
   </Svg>
 );
 
-const GazzettePDF = ({ state }: { state: GazzetteState }) => (
+const GazzettePDF = ({ state, mode }: { state: GazzetteState, mode: 'digital' | 'print' }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       
@@ -408,18 +409,37 @@ const GazzettePDF = ({ state }: { state: GazzetteState }) => (
         </View>
       </View>
 
-      <View style={styles.footer} fixed>
-        <Text style={styles.footerKicker}>Feel Good Corner</Text>
-        <Text style={styles.footerText}>"Excellence is not an act, but a habit."</Text>
+<View style={[styles.footer, mode === 'print' ? { paddingBottom: 16 } : {}]} fixed>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          <Text style={styles.footerKicker}>Feel Good Corner</Text>
+          {mode === 'print' && (
+            <View style={{ width: 40, height: 40, backgroundColor: 'white', padding: 2 }}>
+              <Svg viewBox="0 0 10 10" width="36" height="36">
+                <Rect x="1" y="1" width="3" height="3" fill="black" />
+                <Rect x="6" y="1" width="3" height="3" fill="black" />
+                <Rect x="1" y="6" width="3" height="3" fill="black" />
+                <Rect x="2" y="2" width="1" height="1" fill="white" />
+                <Rect x="7" y="2" width="1" height="1" fill="white" />
+                <Rect x="2" y="7" width="1" height="1" fill="white" />
+                <Rect x="6" y="6" width="1" height="1" fill="black" />
+                <Rect x="8" y="7" width="1" height="1" fill="black" />
+                <Rect x="7" y="8" width="1" height="1" fill="black" />
+                <Rect x="5" y="4" width="2" height="1" fill="black" />
+                <Rect x="4" y="5" width="1" height="2" fill="black" />
+              </Svg>
+            </View>
+          )}
+          <Text style={styles.footerText}>"Excellence is not an act, but a habit."</Text>
+        </View>
       </View>
 
     </Page>
   </Document>
 );
 
-export const exportPdf = async (state: GazzetteState) => {
+export const exportPdf = async (state: GazzetteState, mode: 'digital' | 'print' = 'digital') => {
   try {
-    const blob = await pdf(<GazzettePDF state={state} />).toBlob();
+    const blob = await pdf(<GazzettePDF state={state} mode={mode} />).toBlob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
