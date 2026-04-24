@@ -15,6 +15,7 @@ export default {
           accent2: '#a57ced',
           footer: '#1b1029',
           text: '#1f2937',
+          quote: '#8b2c39', // Added based on the screenshot
         }
       },
       fontFamily: {
