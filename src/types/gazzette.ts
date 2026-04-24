@@ -1,49 +1,51 @@
-export interface MastheadData {
+export interface MastheadState {
   title: string;
   date: string;
   volume: string;
   tags: string[];
 }
 
-export interface SpotlightData {
+export interface FeatureStoryState {
+  kicker: string;
+  headline: string;
+  author: string;
+  paragraphs: string[];
+  pullQuote: string;
+  pullQuotePosition: number;
+}
+
+export interface SpotlightState {
   imageUrl: string;
   caption: string;
   grayscale: boolean;
 }
 
-export interface QuoteData {
+export interface QuoteState {
   text: string;
   author: string;
 }
 
-export interface StaffBoxData {
+export interface StaffBoxState {
   editorInChief: string;
   contributors: string[];
   artDirection: string;
   copyright: string;
 }
 
-export interface FeatureStoryData {
-  kicker: string;
-  headline: string;
-  author: string;
-  paragraphs: string[];
-  pullQuote: string;
-  pullQuotePosition: number; // After which paragraph
-}
-
-export interface SecondaryArticleData {
+export interface SecondaryArticleState {
   kicker: string;
   headline: string;
   content: string;
 }
 
 export interface GazzetteState {
-  masthead: MastheadData;
-  spotlight: SpotlightData;
-  quote: QuoteData;
-  staffBox: StaffBoxData;
-  featureStory: FeatureStoryData;
-  secondaryArticle1: SecondaryArticleData;
-  secondaryArticle2: SecondaryArticleData;
+  masthead: MastheadState;
+  featureStory: FeatureStoryState;
+  spotlight: SpotlightState;
+  quote: QuoteState;
+  staffBox: StaffBoxState;
+  secondaryArticle1: SecondaryArticleState;
+  secondaryArticle2: SecondaryArticleState;
+  vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
+  dropCapStyle?: 'classic' | 'ornamental';
 }
