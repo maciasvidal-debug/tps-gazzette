@@ -50,11 +50,14 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
   const handleChange = (section: keyof GazzetteState, field: string, value: string | boolean | number | string[]) => {
     updateState((draft) => {
       if (field === '') {
-        // @ts-expect-error - top level assignment
+        // @ts-expect-error - top-level assignment
         draft[section] = value;
       } else {
-        // @ts-expect-error - dynamic key assignment
-        draft[section][field] = value;
+        const targetSection = draft[section];
+        if (targetSection) {
+          // @ts-expect-error - nested dynamic assignment
+          targetSection[field] = value;
+        }
       }
     });
   };
