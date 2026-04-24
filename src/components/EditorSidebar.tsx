@@ -71,7 +71,16 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
     value: GazzetteState[S][F]
   ) => {
     updateState((draft) => {
-      draft[section][field] = value;
+      if (field === '') {
+        // @ts-expect-error - top-level assignment
+        draft[section] = value;
+      } else {
+        const targetSection = draft[section];
+        if (targetSection) {
+          // @ts-expect-error - nested dynamic assignment
+          targetSection[field] = value;
+        }
+      }
     });
   };
 
