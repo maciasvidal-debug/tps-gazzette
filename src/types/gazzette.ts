@@ -41,7 +41,15 @@ export interface SecondaryArticleState {
   content: string;
 }
 
+
+export interface TransformState {
+  translate: [number, number];
+  rotate: number;
+  scale: [number, number];
+}
+
 export interface GazzetteState {
+
   masthead: MastheadState;
   featureStory: FeatureStoryState;
   spotlight: SpotlightState;
@@ -52,4 +60,7 @@ export interface GazzetteState {
   vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
   dropCapStyle?: 'classic' | 'ornamental';
   layoutTemplate?: 'classic' | 'modern' | 'visual';
+  typography?: { serif: string; sans: string; baseSize: number; };
+  transforms?: Record<string, TransformState>;
+  freeDesignMode?: boolean;
 }
