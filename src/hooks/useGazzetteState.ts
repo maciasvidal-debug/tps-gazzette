@@ -75,7 +75,7 @@ export function useGazzetteState() {
 
   const updateState = (updater: (draft: GazzetteState) => void | GazzetteState) => {
     setState((prev) => {
-      const nextState = JSON.parse(JSON.stringify(prev));
+      const nextState = structuredClone(prev);
       const result = updater(nextState);
       return result || nextState;
     });
