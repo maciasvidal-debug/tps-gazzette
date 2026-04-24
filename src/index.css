@@ -33,3 +33,13 @@ body {
   margin: 0;
   padding: 0;
 }
+
+@layer utilities {
+  .editorial-text {
+    text-justify: inter-word;
+    hyphens: auto;
+    break-inside: avoid;
+    orphans: 2;
+    widows: 2;
+  }
+}
