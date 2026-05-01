@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { GazzetteState } from '../types/gazzette';
+import { AccordionSection, FormInput, FormTextArea, FormSelect } from './FormElements';
 
 interface EditorSidebarProps {
   state: GazzetteState;
@@ -7,37 +8,6 @@ interface EditorSidebarProps {
   resetState: () => void;
   onExportPdf: (mode?: 'digital' | 'print') => void;
 }
-
-const AccordionSection: React.FC<{
-  title: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  children: React.ReactNode
-}> = ({ title, isOpen, onToggle, children }) => {
-  return (
-    <div className="border-b border-[#2C2D35]">
-      <button
-        onClick={onToggle}
-        className="w-full py-4 px-6 flex justify-between items-center text-[#E5E7EB] hover:bg-[#2C2D35] transition-colors"
-      >
-        <span className="font-sans text-xs font-bold tracking-widest uppercase">{title}</span>
-        <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {isOpen && (
-        <div className="p-6 bg-[#1A1A1E] space-y-4">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-};
 
 export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState, resetState, onExportPdf }) => {
   const [openSection, setOpenSection] = useState<string | null>('masthead');
@@ -47,20 +17,36 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
     setOpenSection(openSection === section ? null : section);
   };
 
-  const handleChange = (section: keyof GazzetteState, field: string, value: string | boolean | number | string[]) => {
+  /**
+   * Updates a specific field in the state.
+   * Uses generics to improve type safety at call sites as per project guidelines.
+   */
+  function handleChange<S extends keyof GazzetteState>(
+    section: S,
+    field: '',
+    value: GazzetteState[S]
+  ): void;
+  function handleChange<S extends keyof GazzetteState, F extends keyof GazzetteState[S]>(
+    section: S,
+    field: F,
+    value: GazzetteState[S][F]
+  ): void;
+  function handleChange(
+    section: keyof GazzetteState,
+    field: string,
+    value: any
+  ) {
     updateState((draft) => {
       if (field === '') {
-        // @ts-expect-error - top-level assignment
-        draft[section] = value;
+        (draft as any)[section] = value;
       } else {
         const targetSection = draft[section];
-        if (targetSection) {
-          // @ts-expect-error - nested dynamic assignment
-          targetSection[field] = value;
+        if (targetSection && typeof targetSection === 'object') {
+          (targetSection as any)[field] = value;
         }
       }
     });
-  };
+  }
 
   const handleParagraphChange = (index: number, value: string) => {
     updateState((draft) => {
@@ -80,7 +66,6 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
     });
   };
 
-  const inputClass = "w-full bg-[#212126] border border-[#343541] rounded text-[#E5E7EB] p-2 text-sm focus:border-[#ED6A5E] focus:outline-none focus:ring-1 focus:ring-[#ED6A5E] transition-colors placeholder-[#4B4C56]";
   const labelClass = "block text-[#8B8D98] mb-1 text-xs font-bold uppercase tracking-wider font-sans";
 
   return (
@@ -102,16 +87,15 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {/* GLOBAL SETTINGS */}
         <div className="p-6 bg-[#1A1A1E] border-b border-[#2C2D35] mb-4">
-          <label className={labelClass}>Layout Template</label>
-          <select
-            className={inputClass}
+          <FormSelect
+            label="Layout Template"
             value={state.layoutTemplate || 'classic'}
-            onChange={e => handleChange('layoutTemplate' as keyof GazzetteState, '', e.target.value)}
+            onChange={e => handleChange('layoutTemplate', '', e.target.value as any)}
           >
             <option value="classic">Classic Academic</option>
             <option value="modern">Modern Impact</option>
             <option value="visual">Visual / Gallery</option>
-          </select>
+          </FormSelect>
         </div>
         {/* MASTHEAD SECTION */}
         <AccordionSection
@@ -119,39 +103,43 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           isOpen={openSection === 'masthead'}
           onToggle={() => toggleSection('masthead')}
         >
-          <div>
-            <label className={labelClass}>Title</label>
-            <input type="text" className={inputClass} value={state.masthead.title} onChange={e => handleChange('masthead', 'title', e.target.value)} />
-          </div>
+          <FormInput
+            label="Title"
+            value={state.masthead.title}
+            onChange={e => handleChange('masthead', 'title', e.target.value)}
+          />
           <div className="flex gap-2">
-            <div className="flex-1">
-              <label className={labelClass}>Date</label>
-              <input type="text" className={inputClass} value={state.masthead.date} onChange={e => handleChange('masthead', 'date', e.target.value)} />
-            </div>
-            <div className="w-1/3">
-              <label className={labelClass}>Volume</label>
-              <input type="text" className={inputClass} value={state.masthead.volume} onChange={e => handleChange('masthead', 'volume', e.target.value)} />
-            </div>
+            <FormInput
+              label="Date"
+              containerClassName="flex-1"
+              value={state.masthead.date}
+              onChange={e => handleChange('masthead', 'date', e.target.value)}
+            />
+            <FormInput
+              label="Volume"
+              containerClassName="w-1/3"
+              value={state.masthead.volume}
+              onChange={e => handleChange('masthead', 'volume', e.target.value)}
+            />
           </div>
 
-          <div className="mt-4">
-            <label className={labelClass}>Theme Style (Vignettes)</label>
-            <select
-              className={inputClass}
-              value={state.vignetteStyle || 'classic'}
-              onChange={e => handleChange('vignetteStyle' as keyof GazzetteState, '', e.target.value)}
-            >
-              <option value="classic">Classic Scroll</option>
-              <option value="science">Scientific (Atoms)</option>
-              <option value="writing">Editorial (Quill)</option>
-              <option value="medical">Medical (Caduceus)</option>
-            </select>
-          </div>
+          <FormSelect
+            label="Theme Style (Vignettes)"
+            containerClassName="mt-4"
+            value={state.vignetteStyle || 'classic'}
+            onChange={e => handleChange('vignetteStyle', '', e.target.value as any)}
+          >
+            <option value="classic">Classic Scroll</option>
+            <option value="science">Scientific (Atoms)</option>
+            <option value="writing">Editorial (Quill)</option>
+            <option value="medical">Medical (Caduceus)</option>
+          </FormSelect>
 
-          <div>
-            <label className={labelClass}>Tags (csv)</label>
-            <input type="text" className={inputClass} value={state.masthead.tags.join(', ')} onChange={e => handleChange('masthead', 'tags', e.target.value.split(',').map(s => s.trim()))} />
-          </div>
+          <FormInput
+            label="Tags (csv)"
+            value={state.masthead.tags.join(', ')}
+            onChange={e => handleChange('masthead', 'tags', e.target.value.split(',').map(s => s.trim()))}
+          />
         </AccordionSection>
 
         {/* FEATURE STORY SECTION */}
@@ -160,37 +148,39 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           isOpen={openSection === 'featureStory'}
           onToggle={() => toggleSection('featureStory')}
         >
-          <div>
-            <label className={labelClass}>Kicker</label>
-            <input type="text" className={inputClass} value={state.featureStory.kicker} onChange={e => handleChange('featureStory', 'kicker', e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClass}>Headline</label>
-            <textarea className={inputClass} rows={2} value={state.featureStory.headline} onChange={e => handleChange('featureStory', 'headline', e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClass}>Author</label>
-            <input type="text" className={inputClass} value={state.featureStory.author} onChange={e => handleChange('featureStory', 'author', e.target.value)} />
-          </div>
+          <FormInput
+            label="Kicker"
+            value={state.featureStory.kicker}
+            onChange={e => handleChange('featureStory', 'kicker', e.target.value)}
+          />
+          <FormTextArea
+            label="Headline"
+            rows={2}
+            value={state.featureStory.headline}
+            onChange={e => handleChange('featureStory', 'headline', e.target.value)}
+          />
+          <FormInput
+            label="Author"
+            value={state.featureStory.author}
+            onChange={e => handleChange('featureStory', 'author', e.target.value)}
+          />
 
+          <FormSelect
+            label="Drop Cap Style"
+            containerClassName="mt-4"
+            value={state.dropCapStyle || 'classic'}
+            onChange={e => handleChange('dropCapStyle', '', e.target.value as any)}
+          >
+            <option value="classic">Classic Typography</option>
+            <option value="ornamental">Ornamental (Floral/Vine)</option>
+          </FormSelect>
 
-          <div className="mt-4">
-            <label className={labelClass}>Drop Cap Style</label>
-            <select
-              className={inputClass}
-              value={state.dropCapStyle || 'classic'}
-              onChange={e => handleChange('dropCapStyle' as keyof GazzetteState, '', e.target.value)}
-            >
-              <option value="classic">Classic Typography</option>
-              <option value="ornamental">Ornamental (Floral/Vine)</option>
-            </select>
-          </div>
           <div className="mt-4">
             <label className={labelClass}>Paragraphs</label>
             {state.featureStory.paragraphs.map((p, i) => (
               <div key={i} className="flex gap-2 mb-2">
-                <textarea
-                  className={inputClass}
+                <FormTextArea
+                  containerClassName="flex-1"
                   rows={4}
                   value={p}
                   onChange={e => handleParagraphChange(i, e.target.value)}
@@ -202,10 +192,19 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           </div>
 
           <div className="mt-4 p-4 bg-[#2C2D35] rounded">
-            <label className={labelClass}>Pull Quote</label>
-            <textarea className={`${inputClass} mb-3`} rows={2} value={state.featureStory.pullQuote} onChange={e => handleChange('featureStory', 'pullQuote', e.target.value)} />
-            <label className={labelClass}>Position (After P #)</label>
-            <input type="number" className={inputClass} value={state.featureStory.pullQuotePosition} onChange={e => handleChange('featureStory', 'pullQuotePosition', parseInt(e.target.value))} />
+            <FormTextArea
+              label="Pull Quote"
+              containerClassName="mb-3"
+              rows={2}
+              value={state.featureStory.pullQuote}
+              onChange={e => handleChange('featureStory', 'pullQuote', e.target.value)}
+            />
+            <FormInput
+              label="Position (After P #)"
+              type="number"
+              value={state.featureStory.pullQuotePosition}
+              onChange={e => handleChange('featureStory', 'pullQuotePosition', parseInt(e.target.value))}
+            />
           </div>
         </AccordionSection>
 
@@ -215,39 +214,36 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           isOpen={openSection === 'spotlight'}
           onToggle={() => toggleSection('spotlight')}
         >
-          <div>
-            <label className={labelClass}>Image URL (1:1)</label>
-            <input type="text" className={inputClass} value={state.spotlight.imageUrl} onChange={e => handleChange('spotlight', 'imageUrl', e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClass}>Caption</label>
-            <textarea className={inputClass} rows={2} value={state.spotlight.caption} onChange={e => handleChange('spotlight', 'caption', e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClass}>Image Fit</label>
-            <select
-              className={inputClass}
-              value={state.spotlight.fit || 'cover'}
-              onChange={e => handleChange('spotlight', 'fit', e.target.value)}
-            >
-              <option value="cover">Fill (Cover)</option>
-              <option value="contain">Fit (Contain)</option>
-            </select>
-          </div>
-          <div>
-            <label className={labelClass}>Image Position</label>
-            <select
-              className={inputClass}
-              value={state.spotlight.position || 'center'}
-              onChange={e => handleChange('spotlight', 'position', e.target.value)}
-            >
-              <option value="center">Center</option>
-              <option value="top">Top</option>
-              <option value="bottom">Bottom</option>
-              <option value="left">Left</option>
-              <option value="right">Right</option>
-            </select>
-          </div>
+          <FormInput
+            label="Image URL (1:1)"
+            value={state.spotlight.imageUrl}
+            onChange={e => handleChange('spotlight', 'imageUrl', e.target.value)}
+          />
+          <FormTextArea
+            label="Caption"
+            rows={2}
+            value={state.spotlight.caption}
+            onChange={e => handleChange('spotlight', 'caption', e.target.value)}
+          />
+          <FormSelect
+            label="Image Fit"
+            value={state.spotlight.fit || 'cover'}
+            onChange={e => handleChange('spotlight', 'fit', e.target.value as any)}
+          >
+            <option value="cover">Fill (Cover)</option>
+            <option value="contain">Fit (Contain)</option>
+          </FormSelect>
+          <FormSelect
+            label="Image Position"
+            value={state.spotlight.position || 'center'}
+            onChange={e => handleChange('spotlight', 'position', e.target.value as any)}
+          >
+            <option value="center">Center</option>
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </FormSelect>
           <div>
             <label className={labelClass}>Image Zoom (Scale): {state.spotlight.scale || 1}x</label>
             <input
@@ -270,14 +266,17 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           isOpen={openSection === 'quote'}
           onToggle={() => toggleSection('quote')}
         >
-          <div>
-            <label className={labelClass}>Text</label>
-            <textarea className={inputClass} rows={2} value={state.quote.text} onChange={e => handleChange('quote', 'text', e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClass}>Author</label>
-            <input type="text" className={inputClass} value={state.quote.author} onChange={e => handleChange('quote', 'author', e.target.value)} />
-          </div>
+          <FormTextArea
+            label="Text"
+            rows={2}
+            value={state.quote.text}
+            onChange={e => handleChange('quote', 'text', e.target.value)}
+          />
+          <FormInput
+            label="Author"
+            value={state.quote.author}
+            onChange={e => handleChange('quote', 'author', e.target.value)}
+          />
         </AccordionSection>
 
         {/* SECONDARY ARTICLES */}
@@ -289,24 +288,24 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           <div className="mb-6 p-4 bg-[#2C2D35] rounded">
             <h4 className="font-bold text-[#E5E7EB] mb-3 text-sm">Article 1 (Left)</h4>
             <div className="space-y-3">
-              <input type="text" placeholder="Kicker" className={inputClass} value={state.secondaryArticle1.kicker} onChange={e => handleChange('secondaryArticle1', 'kicker', e.target.value)} />
-              <input type="text" placeholder="Headline" className={inputClass} value={state.secondaryArticle1.headline} onChange={e => handleChange('secondaryArticle1', 'headline', e.target.value)} />
-              <textarea placeholder="Content" className={inputClass} rows={4} value={state.secondaryArticle1.content} onChange={e => handleChange('secondaryArticle1', 'content', e.target.value)} />
+              <FormInput placeholder="Kicker" value={state.secondaryArticle1.kicker} onChange={e => handleChange('secondaryArticle1', 'kicker', e.target.value)} />
+              <FormInput placeholder="Headline" value={state.secondaryArticle1.headline} onChange={e => handleChange('secondaryArticle1', 'headline', e.target.value)} />
+              <FormTextArea placeholder="Content" rows={4} value={state.secondaryArticle1.content} onChange={e => handleChange('secondaryArticle1', 'content', e.target.value)} />
             </div>
           </div>
 
           <div className="p-4 bg-[#2C2D35] rounded">
             <h4 className="font-bold text-[#E5E7EB] mb-3 text-sm">Article 2 (Right)</h4>
             <div className="space-y-3">
-              <input type="text" placeholder="Kicker" className={inputClass} value={state.secondaryArticle2.kicker} onChange={e => handleChange('secondaryArticle2', 'kicker', e.target.value)} />
-              <input type="text" placeholder="Headline" className={inputClass} value={state.secondaryArticle2.headline} onChange={e => handleChange('secondaryArticle2', 'headline', e.target.value)} />
-              <textarea placeholder="Content" className={inputClass} rows={4} value={state.secondaryArticle2.content} onChange={e => handleChange('secondaryArticle2', 'content', e.target.value)} />
+              <FormInput placeholder="Kicker" value={state.secondaryArticle2.kicker} onChange={e => handleChange('secondaryArticle2', 'kicker', e.target.value)} />
+              <FormInput placeholder="Headline" value={state.secondaryArticle2.headline} onChange={e => handleChange('secondaryArticle2', 'headline', e.target.value)} />
+              <FormTextArea placeholder="Content" rows={4} value={state.secondaryArticle2.content} onChange={e => handleChange('secondaryArticle2', 'content', e.target.value)} />
             </div>
           </div>
         </AccordionSection>
       </div>
 
-<div className="p-4 bg-[#1A1A1E] border-t border-[#2C2D35] mt-auto">
+      <div className="p-4 bg-[#1A1A1E] border-t border-[#2C2D35] mt-auto">
         <div className="flex gap-2 mb-3">
           <button
             onClick={() => setExportMode('digital')}
@@ -322,7 +321,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           </button>
         </div>
         <button
-          onClick={() => onExportPdf(exportMode)} // We could pass mode here, but let's just trigger it. In reality we'd extend onExportPdf to take the mode.
+          onClick={() => onExportPdf(exportMode)}
           className="w-full bg-[#E5484D] hover:bg-[#F2555A] text-white py-3 px-4 rounded text-sm font-bold transition-colors flex items-center justify-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
