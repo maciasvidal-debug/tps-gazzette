@@ -1,5 +1,33 @@
 import React from 'react';
 
+const validateUrl = (url: string): string => {
+  const sanitizedUrl = url.trim();
+
+  // Allow relative paths (starting with / or ./)
+  if (sanitizedUrl.startsWith('/') || sanitizedUrl.startsWith('./')) {
+    return sanitizedUrl;
+  }
+
+  // Allow safe protocols
+  const safeProtocols = ['http:', 'https:', 'mailto:', 'tel:'];
+  try {
+    const parsedUrl = new URL(sanitizedUrl);
+    if (safeProtocols.includes(parsedUrl.protocol)) {
+      return sanitizedUrl;
+    }
+  } catch {
+    // If URL parsing fails, it might be a relative path or an invalid URL
+    // We already checked for common relative path prefixes.
+    // If it's something else that's not a valid absolute URL, it's safer to block it if it looks like a protocol
+    if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(sanitizedUrl)) {
+      return '#';
+    }
+    return sanitizedUrl;
+  }
+
+  return '#';
+};
+
 export const MarkdownText: React.FC<{ text: string; className?: string }> = ({ text, className }) => {
   // Simple parser for **bold**, *italic*, and [link](url)
   // Split by links first, then bold/italic
@@ -32,7 +60,7 @@ export const MarkdownText: React.FC<{ text: string; className?: string }> = ({ t
     parts.push(
       <a
         key={`link-${match.index}`}
-        href={match[2]}
+        href={validateUrl(match[2])}
         target="_blank"
         rel="noopener noreferrer"
         className="text-tps-accent1 hover:text-tps-accent2 underline underline-offset-2 decoration-1"
