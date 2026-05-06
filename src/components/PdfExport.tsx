@@ -450,6 +450,6 @@ export const exportPdf = async (state: GazzetteState, mode: 'digital' | 'print' 
     URL.revokeObjectURL(url);
   } catch (error) {
     console.error("Error generating PDF:", error);
-    throw new Error("Failed to generate PDF. Check console for details.");
+    throw new Error("Failed to generate PDF. Check console for details.", { cause: error });
   }
 };

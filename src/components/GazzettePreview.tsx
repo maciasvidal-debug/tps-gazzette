@@ -2,7 +2,9 @@ import React, { forwardRef } from 'react';
 import type { GazzetteState, TransformState } from '../types/gazzette';
 import { Vignette } from './Vignette';
 import { MarkdownText } from './MarkdownText';
+import { EditableText } from './EditableText';
 import { MoveableWrapper } from './MoveableWrapper';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface PreviewProps {
   state: GazzetteState;
@@ -12,10 +14,17 @@ interface PreviewProps {
 export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state, updateState }, ref) => {
   const handleTransformChange = (id: string, transform: TransformState) => {
     if (updateState) {
-      updateState(draft => {
+      handleUpdate(draft => {
         if (!draft.transforms) draft.transforms = {};
         draft.transforms[id] = transform;
       });
+    }
+  };
+
+
+  const handleUpdate = (updater: (draft: GazzetteState) => void) => {
+    if (updateState) {
+      updateState(updater);
     }
   };
 
@@ -88,10 +97,10 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
                   Quote of the Week
                 </div>
                 <blockquote className="font-serif text-lg italic text-tps-quote leading-relaxed mt-2">
-                  "{state.quote.text}"
+                  "<EditableText tagName="span" multiline value={state.quote.text} onChange={(val) => handleUpdate(draft => { draft.quote.text = val; })} />"
                 </blockquote>
                 <div className="mt-3 font-sans text-xs font-bold text-tps-text">
-                  — {state.quote.author}
+                  — <EditableText tagName="span" value={state.quote.author} onChange={(val) => handleUpdate(draft => { draft.quote.author = val; })} />
                 </div>
               </div>
 
@@ -119,10 +128,10 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
             <main className={`${state.layoutTemplate === 'modern' ? 'col-span-1 border-none pl-0' : 'col-span-8 border-l-[1px] border-tps-text pl-8'}`}>
 
               <div className="font-sans text-xs font-bold uppercase tracking-widest text-tps-text mb-4 flex items-center gap-3">
-                {state.featureStory.kicker} <Vignette className="w-16 h-4 text-[#7A6490]" style={state.vignetteStyle} />
+                <EditableText tagName="span" value={state.featureStory.kicker} onChange={(val) => handleUpdate(draft => { draft.featureStory.kicker = val; })} /> <Vignette className="w-16 h-4 text-[#7A6490]" style={state.vignetteStyle} />
               </div>
               {state.layoutTemplate === 'modern' && state.spotlight.imageUrl && (
-                <div className="w-full h-64 overflow-hidden mb-8 bg-gray-100 flex items-center justify-center border-b-[3px] border-tps-primary pb-2">
+                <div className="relative w-full h-64 overflow-hidden mb-8 bg-gray-100 flex items-center justify-center border-b-[3px] border-tps-primary pb-2">
                   <img
                     src={state.spotlight.imageUrl}
                     alt="Spotlight"
@@ -133,13 +142,17 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
                       transform: `scale(${state.spotlight.scale || 1})`
                     }}
                   />
+                  {state.spotlight.link && (
+                    <div className="absolute bottom-4 right-4 bg-white p-2 border border-gray-300 shadow-md flex flex-col items-center">
+                      <QRCodeSVG value={state.spotlight.link} size={64} fgColor={state.themeColors?.primary || "#3c2065"} />
+                      <span className="text-[8px] font-sans font-bold uppercase mt-1 tracking-widest text-tps-text">Scan Me</span>
+                    </div>
+                  )}
                 </div>
               )}
-              <h2 className="font-serif text-5xl font-bold leading-tight text-tps-text mb-4">
-                {state.featureStory.headline}
-              </h2>
+              <EditableText tagName="h2" className="font-serif text-5xl font-bold leading-tight text-tps-text mb-4" multiline value={state.featureStory.headline} onChange={(val) => handleUpdate(draft => { draft.featureStory.headline = val; })} />
               <div className="font-sans text-xs font-bold text-tps-text mb-8 uppercase tracking-widest border-b-[1px] border-tps-text pb-4">
-                By {state.featureStory.author}
+                By <EditableText tagName="span" value={state.featureStory.author} onChange={(val) => handleUpdate(draft => { draft.featureStory.author = val; })} />
               </div>
               
               <div className={`gap-8 font-serif text-sm leading-relaxed text-gray-800 editorial-text ${state.layoutTemplate === 'modern' ? 'columns-3' : 'columns-2'}`}>
@@ -167,7 +180,7 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
                             </svg>
                           </span>
                         ) : (
-                          <span style={{ float: 'left', fontSize: '5.5rem', lineHeight: '0.8', fontWeight: 900, color: '#3c2065', paddingRight: '8px', paddingTop: '8px' }}>
+                          <span style={{ float: 'left', fontSize: '5.5rem', lineHeight: '0.8', fontWeight: 900, color: 'var(--color-tps-primary)', paddingRight: '8px', paddingTop: '8px' }}>
                             {p.charAt(0)}
                           </span>
                         )}
@@ -218,24 +231,29 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
             <div className="col-span-6 pr-4">
               <div className="font-sans text-[10px] font-bold uppercase tracking-widest text-tps-text mb-3 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-tps-accent1"></div>
-                {state.secondaryArticle1.kicker}
+                <EditableText tagName="span" value={state.secondaryArticle1.kicker} onChange={(val) => handleUpdate(draft => { draft.secondaryArticle1.kicker = val; })} />
               </div>
-              <h3 className="font-serif text-3xl font-bold text-tps-text mb-6 leading-snug">
-                {state.secondaryArticle1.headline}
-              </h3>
+              <EditableText tagName="h3" className="font-serif text-3xl font-bold text-tps-text mb-6 leading-snug" multiline value={state.secondaryArticle1.headline} onChange={(val) => handleUpdate(draft => { draft.secondaryArticle1.headline = val; })} />
               <div className="columns-1 gap-6 font-serif text-sm leading-relaxed text-gray-800 editorial-text">
                 <p className="editorial-text"><MarkdownText text={state.secondaryArticle1.content} /></p>
               </div>
+              {state.secondaryArticle1.link && (
+                <div className="mt-4 flex items-center gap-4 bg-white p-3 border border-gray-200">
+                   <QRCodeSVG value={state.secondaryArticle1.link} size={72} fgColor={state.themeColors?.accent1 || "#5e3898"} />
+                   <div>
+                     <div className="font-sans text-[10px] font-bold uppercase tracking-widest text-tps-text mb-1">Take the Quiz!</div>
+                     <div className="font-serif text-xs italic text-gray-600">Scan this code to participate and test your knowledge.</div>
+                   </div>
+                </div>
+              )}
             </div>
 
             <div className="col-span-6 pl-4 border-l-[1px] border-tps-text">
               <div className="font-sans text-[10px] font-bold uppercase tracking-widest text-tps-text mb-3 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-tps-accent2"></div>
-                {state.secondaryArticle2.kicker}
+                <EditableText tagName="span" value={state.secondaryArticle2.kicker} onChange={(val) => handleUpdate(draft => { draft.secondaryArticle2.kicker = val; })} />
               </div>
-              <h3 className="font-serif text-3xl font-bold text-tps-text mb-6 leading-snug">
-                {state.secondaryArticle2.headline}
-              </h3>
+              <EditableText tagName="h3" className="font-serif text-3xl font-bold text-tps-text mb-6 leading-snug" multiline value={state.secondaryArticle2.headline} onChange={(val) => handleUpdate(draft => { draft.secondaryArticle2.headline = val; })} />
               <div className="columns-1 gap-6 font-serif text-sm leading-relaxed text-gray-800 editorial-text">
                 <p className="editorial-text"><MarkdownText text={state.secondaryArticle2.content} /></p>
               </div>

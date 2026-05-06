@@ -21,6 +21,7 @@ export interface SpotlightState {
   scale?: number;
   position?: 'center' | 'top' | 'bottom' | 'left' | 'right';
   fit?: 'cover' | 'contain';
+  link?: string;
 }
 
 export interface QuoteState {
@@ -39,6 +40,7 @@ export interface SecondaryArticleState {
   kicker: string;
   headline: string;
   content: string;
+  link?: string;
 }
 
 
@@ -49,6 +51,15 @@ export interface TransformState {
 }
 
 export interface GazzetteState {
+
+  themeColors?: {
+    primary: string;
+    accent1: string;
+    accent2: string;
+    quote: string;
+    text: string;
+  };
+
 
   masthead: MastheadState;
   featureStory: FeatureStoryState;

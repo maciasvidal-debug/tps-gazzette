@@ -4,6 +4,14 @@ import type { GazzetteState } from '../types/gazzette';
 const STORAGE_KEY = 'tps_gazzette_draft';
 
 const defaultState: GazzetteState = {
+  themeColors: {
+    primary: '#3c2065',
+    accent1: '#5e3898',
+    accent2: '#a57ced',
+    quote: '#8b2c39',
+    text: '#1f2937'
+  },
+
   masthead: {
     title: 'THE TPS GAZZETTE',
     date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),

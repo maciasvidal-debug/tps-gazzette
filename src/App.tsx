@@ -3,11 +3,13 @@ import { useGazzetteState } from './hooks/useGazzetteState';
 import { EditorSidebar } from './components/EditorSidebar';
 import { GazzettePreview } from './components/GazzettePreview';
 import { exportPdf } from './components/PdfExport';
+import { FlipbookMode } from './components/FlipbookMode';
 
 function App() {
   const { state, updateState, resetState } = useGazzetteState();
   const printRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(0.85);
+  const [showFlipbook, setShowFlipbook] = useState(false);
 
   const handleExportPdf = (mode: 'digital' | 'print' = 'digital') => {
     exportPdf(state, mode);
@@ -62,7 +64,14 @@ function App() {
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
             </button>
-            <div className="w-px h-4 bg-[#343541] mx-1"></div>
+            <button
+              onClick={() => setShowFlipbook(true)}
+              className="flex items-center gap-2 bg-[#ED6A5E] hover:bg-[#F2555A] text-white px-3 py-1.5 rounded text-xs font-bold transition-colors shadow-sm ml-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+              Mobile Preview
+            </button>
+            <div className="w-px h-4 bg-[#343541] mx-2"></div>
             <button
               onClick={handleZoomReset}
               className="w-8 h-8 flex items-center justify-center rounded text-[#8B8D98] hover:text-white hover:bg-[#343541] transition-colors border border-transparent hover:border-[#4B4C56]"
@@ -80,6 +89,7 @@ function App() {
           </div>
         </div>
       </main>
+      {showFlipbook && <FlipbookMode state={state} onClose={() => setShowFlipbook(false)} />}
     </div>
   );
 }
