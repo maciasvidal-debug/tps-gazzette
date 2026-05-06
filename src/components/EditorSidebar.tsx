@@ -31,18 +31,20 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
     field: F,
     value: GazzetteState[S][F]
   ): void;
-  function handleChange(
-    section: keyof GazzetteState,
-    field: string,
-    value: any
+  function handleChange<S extends keyof GazzetteState, F extends keyof NonNullable<GazzetteState[S]>>(
+    section: S,
+    field: F | '',
+    value: GazzetteState[S] | NonNullable<GazzetteState[S]>[F]
   ) {
     updateState((draft) => {
       if (field === '') {
-        (draft as any)[section] = value;
+        const draftSection = draft as { [K in S]: GazzetteState[K] };
+        draftSection[section] = value as GazzetteState[S];
       } else {
         const targetSection = draft[section];
         if (targetSection && typeof targetSection === 'object') {
-          (targetSection as any)[field] = value;
+          const draftField = targetSection as { [K in F]: NonNullable<GazzetteState[S]>[K] };
+          draftField[field as F] = value as NonNullable<GazzetteState[S]>[F];
         }
       }
     });
@@ -90,7 +92,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           <FormSelect
             label="Layout Template"
             value={state.layoutTemplate || 'classic'}
-            onChange={e => handleChange('layoutTemplate', '', e.target.value as any)}
+            onChange={e => handleChange('layoutTemplate', '', e.target.value as GazzetteState['layoutTemplate'])}
           >
             <option value="classic">Classic Academic</option>
             <option value="modern">Modern Impact</option>
@@ -127,7 +129,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
             label="Theme Style (Vignettes)"
             containerClassName="mt-4"
             value={state.vignetteStyle || 'classic'}
-            onChange={e => handleChange('vignetteStyle', '', e.target.value as any)}
+            onChange={e => handleChange('vignetteStyle', '', e.target.value as GazzetteState['vignetteStyle'])}
           >
             <option value="classic">Classic Scroll</option>
             <option value="science">Scientific (Atoms)</option>
@@ -169,7 +171,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
             label="Drop Cap Style"
             containerClassName="mt-4"
             value={state.dropCapStyle || 'classic'}
-            onChange={e => handleChange('dropCapStyle', '', e.target.value as any)}
+            onChange={e => handleChange('dropCapStyle', '', e.target.value as GazzetteState['dropCapStyle'])}
           >
             <option value="classic">Classic Typography</option>
             <option value="ornamental">Ornamental (Floral/Vine)</option>
@@ -228,7 +230,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           <FormSelect
             label="Image Fit"
             value={state.spotlight.fit || 'cover'}
-            onChange={e => handleChange('spotlight', 'fit', e.target.value as any)}
+            onChange={e => handleChange('spotlight', 'fit', e.target.value as NonNullable<GazzetteState['spotlight']>['fit'])}
           >
             <option value="cover">Fill (Cover)</option>
             <option value="contain">Fit (Contain)</option>
@@ -236,7 +238,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           <FormSelect
             label="Image Position"
             value={state.spotlight.position || 'center'}
-            onChange={e => handleChange('spotlight', 'position', e.target.value as any)}
+            onChange={e => handleChange('spotlight', 'position', e.target.value as NonNullable<GazzetteState['spotlight']>['position'])}
           >
             <option value="center">Center</option>
             <option value="top">Top</option>
