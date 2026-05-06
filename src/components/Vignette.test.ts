@@ -7,7 +7,7 @@ interface MockElement {
   props: {
     className?: string;
     viewBox?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
