@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useGazzetteState } from './hooks/useGazzetteState';
 import { EditorSidebar } from './components/EditorSidebar';
 import { GazzettePreview } from './components/GazzettePreview';
@@ -9,6 +9,40 @@ function App() {
   const { state, updateState, resetState } = useGazzetteState();
   const printRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(0.85);
+  const [sidebarWidth, setSidebarWidth] = useState(384); // Default 96rem/w-96 is 384px
+  const isResizing = useRef(false);
+
+  const startResizing = React.useCallback(() => {
+    isResizing.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  const stopResizing = React.useCallback(() => {
+    isResizing.current = false;
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = 'auto';
+  }, []);
+
+  const resize = React.useCallback(
+    (mouseMoveEvent: MouseEvent) => {
+      if (isResizing.current) {
+        // Limit min width to 250px and max width to 800px
+        const newWidth = Math.min(Math.max(mouseMoveEvent.clientX, 250), 800);
+        setSidebarWidth(newWidth);
+      }
+    },
+    []
+  );
+
+  React.useEffect(() => {
+    window.addEventListener("mousemove", resize);
+    window.addEventListener("mouseup", stopResizing);
+    return () => {
+      window.removeEventListener("mousemove", resize);
+      window.removeEventListener("mouseup", stopResizing);
+    };
+  }, [resize, stopResizing]);
   const [showFlipbook, setShowFlipbook] = useState(false);
 
   const handleExportPdf = (mode: 'digital' | 'print' = 'digital') => {
@@ -22,12 +56,22 @@ function App() {
   return (
     <div className="flex h-screen overflow-hidden bg-[#2C2D35]">
       {/* Left Panel: Editor */}
+      <div style={{ width: sidebarWidth, flexShrink: 0 }} className="flex h-full">
+      <div className="flex-1 w-full">
       <EditorSidebar 
         state={state} 
         updateState={updateState} 
         resetState={resetState} 
         onExportPdf={handleExportPdf}
       />
+      </div>
+      <div
+        className="w-1.5 cursor-col-resize hover:bg-[#ED6A5E] bg-[#1A1A1E] border-r border-[#2C2D35] flex flex-col justify-center items-center transition-colors"
+        onMouseDown={startResizing}
+      >
+        <div className="w-0.5 h-8 bg-[#4B4C56] rounded-full"></div>
+      </div>
+      </div>
       
       {/* Right Panel: Live Preview */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">

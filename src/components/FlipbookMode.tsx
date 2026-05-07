@@ -164,7 +164,7 @@ export const FlipbookMode: React.FC<Props> = ({ state, onClose }) => {
 
                <div className="mt-12 p-6 rounded-lg text-center" style={{ backgroundColor: theme.primary, color: '#FCFAF5' }}>
                   <div className="text-xs uppercase tracking-widest mb-2 font-bold opacity-80">Feel Good Corner</div>
-                  <div className="font-serif italic text-sm">"Excellence is not an act, but a habit."</div>
+                  <div className="font-serif italic text-sm">{state.feelGoodCorner || '"Excellence is not an act, but a habit."'}</div>
                </div>
 
             </div>

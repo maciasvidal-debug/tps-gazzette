@@ -51,6 +51,7 @@ export interface TransformState {
 }
 
 export interface GazzetteState {
+  feelGoodCorner?: string;
 
   themeColors?: {
     primary: string;

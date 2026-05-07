@@ -3,7 +3,7 @@ import type { GazzetteState } from '../types/gazzette';
 import { AccordionSection, FormInput, FormTextArea, FormSelect } from './FormElements';
 import { ColorExtractor } from './ColorExtractor';
 import { AICopilotButton } from './AICopilotButton';
-import { generateQuote, summarizeText, improveTone } from '../utils/aiCopilot';
+import { generateQuote, generateFeelGood, summarizeText, improveTone } from '../utils/aiCopilot';
 
 interface EditorSidebarProps {
   state: GazzetteState;
@@ -367,6 +367,32 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
             label="Author"
             value={state.quote.author}
             onChange={e => handleChange('quote', 'author', e.target.value)}
+          />
+        </AccordionSection>
+
+        {/* FEEL GOOD CORNER */}
+        <AccordionSection
+          title="Feel Good Corner"
+          isOpen={openSection === 'feelGood'}
+          onToggle={() => toggleSection('feelGood')}
+        >
+          <div className="flex justify-end mb-2">
+             <AICopilotButton
+               label="Generate Feel Good Text"
+               variant="primary"
+               onClick={async () => {
+                 const newText = await generateFeelGood();
+                 updateState(draft => {
+                   draft.feelGoodCorner = newText;
+                 });
+               }}
+             />
+          </div>
+          <FormTextArea
+            label="Text"
+            rows={3}
+            value={state.feelGoodCorner || '"Excellence is not an act, but a habit."'}
+            onChange={e => updateState(draft => { draft.feelGoodCorner = e.target.value; })}
           />
         </AccordionSection>
 
