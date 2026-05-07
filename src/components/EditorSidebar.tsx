@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import type { GazzetteState } from '../types/gazzette';
 import { AccordionSection, FormInput, FormTextArea, FormSelect } from './FormElements';
+import { ColorExtractor } from './ColorExtractor';
+import { AICopilotButton } from './AICopilotButton';
+import { generateQuote, summarizeText, improveTone } from '../utils/aiCopilot';
 
 interface EditorSidebarProps {
   state: GazzetteState;
@@ -21,6 +24,15 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
    * Updates a specific field in the state.
    * Uses generics to improve type safety at call sites as per project guidelines.
    */
+  const handleThemeColorChange = (field: 'primary' | 'accent1' | 'accent2' | 'quote' | 'text', value: string) => {
+    updateState((draft) => {
+      if (!draft.themeColors) {
+        draft.themeColors = { primary: '#3c2065', accent1: '#5e3898', accent2: '#a57ced', quote: '#8b2c39', text: '#1f2937' };
+      }
+      draft.themeColors[field] = value;
+    });
+  };
+
   function handleChange<S extends keyof GazzetteState>(
     section: S,
     field: '',
@@ -99,6 +111,44 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
             <option value="visual">Visual / Gallery</option>
           </FormSelect>
         </div>
+
+        <AccordionSection
+          title="Theme & Style"
+          isOpen={openSection === 'theme'}
+          onToggle={() => toggleSection('theme')}
+        >
+          <div className="space-y-3">
+            <FormInput
+              label="Primary Color"
+              type="color"
+              value={state.themeColors?.primary || '#3c2065'}
+              onChange={e => handleThemeColorChange('primary', e.target.value)}
+            />
+            <div className="flex gap-2">
+              <FormInput
+                label="Accent 1"
+                type="color"
+                containerClassName="flex-1"
+                value={state.themeColors?.accent1 || '#5e3898'}
+                onChange={e => handleThemeColorChange('accent1', e.target.value)}
+              />
+              <FormInput
+                label="Accent 2"
+                type="color"
+                containerClassName="flex-1"
+                value={state.themeColors?.accent2 || '#a57ced'}
+                onChange={e => handleThemeColorChange('accent2', e.target.value)}
+              />
+            </div>
+            <FormInput
+              label="Quote Color"
+              type="color"
+              value={state.themeColors?.quote || '#8b2c39'}
+              onChange={e => handleThemeColorChange('quote', e.target.value)}
+            />
+          </div>
+        </AccordionSection>
+
         {/* MASTHEAD SECTION */}
         <AccordionSection
           title="Masthead"
@@ -180,14 +230,32 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           <div className="mt-4">
             <label className={labelClass}>Paragraphs</label>
             {state.featureStory.paragraphs.map((p, i) => (
-              <div key={i} className="flex gap-2 mb-2">
-                <FormTextArea
-                  containerClassName="flex-1"
-                  rows={4}
-                  value={p}
-                  onChange={e => handleParagraphChange(i, e.target.value)}
-                />
-                <button onClick={() => removeParagraph(i)} className="text-[#ED6A5E] hover:bg-[#343541] px-2 rounded">×</button>
+              <div key={i} className="mb-4 bg-[#2C2D35] p-2 rounded">
+                <div className="flex gap-2 mb-2">
+                  <FormTextArea
+                    containerClassName="flex-1"
+                    rows={4}
+                    value={p}
+                    onChange={e => handleParagraphChange(i, e.target.value)}
+                  />
+                  <button onClick={() => removeParagraph(i)} className="text-[#ED6A5E] hover:bg-[#343541] px-2 rounded h-fit">×</button>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <AICopilotButton
+                    label="Summarize"
+                    onClick={async () => {
+                      const summary = await summarizeText(p);
+                      handleParagraphChange(i, summary);
+                    }}
+                  />
+                  <AICopilotButton
+                    label="Prof. Tone"
+                    onClick={async () => {
+                      const improved = await improveTone(p, 'professional');
+                      handleParagraphChange(i, improved);
+                    }}
+                  />
+                </div>
               </div>
             ))}
             <button onClick={addParagraph} className="w-full py-2 border border-dashed border-[#4B4C56] text-[#8B8D98] rounded hover:bg-[#2C2D35] hover:text-[#E5E7EB] transition-colors text-sm font-bold">+ Add Paragraph</button>
@@ -216,6 +284,14 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           isOpen={openSection === 'spotlight'}
           onToggle={() => toggleSection('spotlight')}
         >
+
+          <ColorExtractor imageUrl={state.spotlight.imageUrl} updateState={updateState} />
+          <FormInput
+            label="Interactive Link (QR Code)"
+            placeholder="https://form.typeform.com/to/..."
+            value={state.spotlight.link || ''}
+            onChange={e => handleChange('spotlight', 'link', e.target.value)}
+          />
           <FormInput
             label="Image URL (1:1)"
             value={state.spotlight.imageUrl}
@@ -268,6 +344,19 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           isOpen={openSection === 'quote'}
           onToggle={() => toggleSection('quote')}
         >
+          <div className="flex justify-end mb-2">
+             <AICopilotButton
+               label="Generate Corporate Quote"
+               variant="primary"
+               onClick={async () => {
+                 const newQuote = await generateQuote();
+                 updateState(draft => {
+                   draft.quote.text = newQuote.text;
+                   draft.quote.author = newQuote.author;
+                 });
+               }}
+             />
+          </div>
           <FormTextArea
             label="Text"
             rows={2}
@@ -293,6 +382,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
               <FormInput placeholder="Kicker" value={state.secondaryArticle1.kicker} onChange={e => handleChange('secondaryArticle1', 'kicker', e.target.value)} />
               <FormInput placeholder="Headline" value={state.secondaryArticle1.headline} onChange={e => handleChange('secondaryArticle1', 'headline', e.target.value)} />
               <FormTextArea placeholder="Content" rows={4} value={state.secondaryArticle1.content} onChange={e => handleChange('secondaryArticle1', 'content', e.target.value)} />
+              <FormInput placeholder="Interactive Link (QR Code)" value={state.secondaryArticle1.link || ''} onChange={e => handleChange('secondaryArticle1', 'link', e.target.value)} />
             </div>
           </div>
 
