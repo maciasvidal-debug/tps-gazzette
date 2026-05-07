@@ -51,6 +51,7 @@ const defaultState: GazzetteState = {
     headline: "Understanding Process Analytical Technology",
     content: "Process Analytical Technology (PAT) represents a framework for innovative pharmaceutical development, manufacturing, and quality assurance. By designing, analyzing, and controlling manufacturing through timely measurements of critical quality attributes, we ensure final product quality.",
   },
+  feelGoodCorner: '"Excellence is not an act, but a habit."',
   secondaryArticle2: {
     kicker: "PROFILES",
     headline: "Inside the New QA Taskforce",

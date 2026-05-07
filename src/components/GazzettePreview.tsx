@@ -108,18 +108,18 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
               <div className="mt-auto pt-4 text-xs font-sans">
                 <div className="font-bold uppercase tracking-wider mb-3 text-tps-text">Staff Box</div>
                 <div className="mb-2">
-                  <span className="font-bold text-tps-text">Editor in Chief:</span> {state.staffBox.editorInChief}
+                  <span className="font-bold text-tps-text">Editor in Chief:</span> <EditableText tagName="span" value={state.staffBox.editorInChief} onChange={(val) => handleUpdate(draft => { draft.staffBox.editorInChief = val; })} />
                 </div>
                 <div className="mb-2">
                   <span className="font-bold text-tps-text">Contributors:</span><br/>
-                  {state.staffBox.contributors.join(', ')}
+                  <EditableText tagName="span" value={state.staffBox.contributors.join(", ")} onChange={(val) => handleUpdate(draft => { draft.staffBox.contributors = val.split(",").map(s => s.trim()); })} />
                 </div>
                 <div className="mb-2">
                   <span className="font-bold text-tps-text">Art Direction:</span><br/>
-                  {state.staffBox.artDirection}
+                  <EditableText tagName="span" value={state.staffBox.artDirection} onChange={(val) => handleUpdate(draft => { draft.staffBox.artDirection = val; })} />
                 </div>
                 <div className="mt-6 text-[10px] text-gray-500 italic">
-                  {state.staffBox.copyright}
+                  <EditableText tagName="span" value={state.staffBox.copyright} onChange={(val) => handleUpdate(draft => { draft.staffBox.copyright = val; })} />
                 </div>
               </div>
             </aside>
@@ -273,7 +273,7 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
               Feel Good Corner
             </div>
             <div className="font-serif text-[10px] italic">
-              "Excellence is not an act, but a habit."
+              <EditableText tagName="span" multiline value={state.feelGoodCorner || '"Excellence is not an act, but a habit."'} onChange={(val) => handleUpdate(draft => { draft.feelGoodCorner = val; })} />
             </div>
           </div>
         </footer>
