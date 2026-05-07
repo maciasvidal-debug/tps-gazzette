@@ -83,7 +83,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
   const labelClass = "block text-[#8B8D98] mb-1 text-xs font-bold uppercase tracking-wider font-sans";
 
   return (
-    <div className="w-80 bg-[#212126] border-r border-[#1A1A1E] h-screen flex flex-col z-10 relative">
+    <div className="w-full bg-[#212126] border-r border-[#1A1A1E] h-screen flex flex-col z-10 relative">
       <div className="p-4 flex justify-between items-center bg-[#2C2D35] border-b border-[#1A1A1E]">
         <h2 className="text-[#E5E7EB] font-sans text-sm font-bold tracking-widest uppercase flex items-center gap-2">
           <svg className="w-4 h-4 text-[#ED6A5E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
