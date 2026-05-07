@@ -390,8 +390,8 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           </div>
           <FormTextArea
             label="Text"
-            rows={3}
-            value={state.feelGoodCorner || '"Excellence is not an act, but a habit."'}
+            rows={8}
+            value={state.feelGoodCorner || 'Time for a break! Here are some quick office hacks or trivia...'}
             onChange={e => updateState(draft => { draft.feelGoodCorner = e.target.value; })}
           />
         </AccordionSection>
