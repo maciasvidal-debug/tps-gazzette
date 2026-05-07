@@ -162,9 +162,14 @@ export const FlipbookMode: React.FC<Props> = ({ state, onClose }) => {
                   <div className="text-sm font-bold uppercase tracking-wider">— {state.quote.author}</div>
                </div>
 
-               <div className="mt-12 p-6 rounded-lg text-center" style={{ backgroundColor: theme.primary, color: '#FCFAF5' }}>
-                  <div className="text-xs uppercase tracking-widest mb-2 font-bold opacity-80">Feel Good Corner</div>
-                  <div className="font-serif italic text-sm">{state.feelGoodCorner || '"Excellence is not an act, but a habit."'}</div>
+               <div className="mt-12 p-6 rounded-lg shadow-md" style={{ backgroundColor: theme.primary, color: '#FCFAF5' }}>
+                  <div className="text-xs uppercase tracking-widest mb-4 font-bold opacity-80 flex items-center gap-2">
+                    <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd"></path></svg>
+                    Feel Good Corner
+                  </div>
+                  <div className="font-sans text-sm whitespace-pre-wrap leading-relaxed">
+                    {state.feelGoodCorner || 'Time for a break! Here are some quick office hacks or trivia...'}
+                  </div>
                </div>
 
             </div>

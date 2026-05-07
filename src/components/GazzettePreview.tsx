@@ -260,23 +260,24 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
             </div>
           </div>
           
-          <div className="mt-auto flex justify-between items-center text-[10px] text-gray-400 font-sans tracking-widest pt-4 border-t-[1px] border-gray-200 mb-16">
-            <span>{state.masthead.title}</span>
+          {/* FEEL GOOD CORNER (MAIN BLOCK) */}
+          <div className="mt-8 mb-8 p-8 rounded shadow-lg border-2" style={{ backgroundColor: 'var(--color-tps-primary)', borderColor: 'var(--color-tps-accent1)' }}>
+            <div className="font-sans text-[14px] font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd"></path></svg>
+              Feel Good Corner
+            </div>
+            <div className="font-sans text-sm text-white whitespace-pre-wrap leading-relaxed opacity-95">
+              <EditableText tagName="div" multiline value={state.feelGoodCorner || 'Time for a break! Here are some quick office hacks or trivia...'} onChange={(val) => handleUpdate(draft => { draft.feelGoodCorner = val; })} />
+            </div>
+          </div>
+
+          <div className="mt-auto flex justify-between items-center text-[10px] text-gray-400 font-sans tracking-widest pt-4 border-t-[1px] border-gray-200 mb-8">
+            <span><EditableText tagName="span" value={state.masthead.title} onChange={(val) => handleUpdate(draft => { draft.masthead.title = val; })} /></span>
             <span>PAGE 2</span>
           </div>
         </div>
 
-        {/* FEEL GOOD CORNER (FOOTER) */}
-        <footer className="bg-tps-footer text-tps-paper py-4 px-12 absolute bottom-0 w-full">
-          <div className="flex justify-between items-center">
-            <div className="font-sans text-[10px] uppercase tracking-widest text-tps-paper">
-              Feel Good Corner
-            </div>
-            <div className="font-serif text-[10px] italic">
-              <EditableText tagName="span" multiline value={state.feelGoodCorner || '"Excellence is not an act, but a habit."'} onChange={(val) => handleUpdate(draft => { draft.feelGoodCorner = val; })} />
-            </div>
-          </div>
-        </footer>
+
       </div>
     </div>
   );

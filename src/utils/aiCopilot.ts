@@ -12,11 +12,13 @@ const corporateQuotes = [
 ];
 
 const feelGoodCorners = [
-  "Take a deep breath. You've survived 100% of your bad days so far.",
-  "Remember to hydrate! A well-watered brain is a creative brain.",
-  "Your best work happens when you take time to rest. Step away from the screen for 5 minutes.",
-  "Did you know? Laughing for 10 minutes a day burns calories. Go find a good joke!",
-  "Small progress is still progress. Celebrate the little wins today."
+  "🧠 **Brain Break: Coffee Edition**\n\nDid you know that the optimal time to drink coffee is actually between 9:30 AM and 11:30 AM? This is when your cortisol levels naturally drop.\n\nOffice Hack: If you need to quickly chill a hot coffee to make iced coffee, drop in 3 stainless steel whiskey stones instead of ice—it won't dilute your brew! ☕",
+
+  "🎮 **Trivia Time!**\n\nWhich common office item was originally invented to be a bookmark?\n\n...\n...\n(Answer: The Post-it Note! Dr. Spencer Silver invented the adhesive in 1968, but it took his colleague Arthur Fry to realize its potential as a bookmark that wouldn't fall out).",
+
+  "🌱 **Desk Yoga Minute**\n\nTime to de-stress:\n1. Sit up straight in your chair.\n2. Reach both arms towards the ceiling and stretch.\n3. Gently twist your torso to the right, holding the back of your chair.\n4. Breathe deeply for 10 seconds.\n5. Repeat on the left side.\n\nYour spine will thank you! 🧘‍♀️",
+
+  "💡 **Pro-Tip: The '2-Minute Rule'**\n\nFeeling overwhelmed by a massive to-do list?\nIf a task takes less than 2 minutes to complete (like answering a quick email or organizing a folder), do it immediately.\n\nIt clears your mind and gives you a quick dopamine hit of accomplishment. Try knocking out three 2-minute tasks right now! ✅"
 ];
 
 export const generateQuote = async (): Promise<{ text: string, author: string }> => {
