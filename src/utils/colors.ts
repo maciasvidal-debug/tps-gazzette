@@ -31,7 +31,7 @@ export const extractColorsFromImage = (imageUrl: string): Promise<number[][]> =>
         ctx.drawImage(img, 0, 0, width, height);
 
         const imageData = ctx.getImageData(0, 0, width, height).data;
-        const colorCounts: Record<string, number> = {};
+        const colorCounts = new Map<number, number>();
 
         // Simple color quantization (ignoring alpha)
         const QUANTIZE_FACTOR = 32; // group colors
@@ -44,14 +44,20 @@ export const extractColorsFromImage = (imageUrl: string): Promise<number[][]> =>
 
             if (a < 128) continue; // skip transparent pixels
 
-            const key = `${r},${g},${b}`;
-            colorCounts[key] = (colorCounts[key] || 0) + 1;
+            // Use bitwise operations to create a unique integer key for the RGB combination.
+            // 10 bits per channel (total 30 bits) fits within a 32-bit signed integer.
+            const key = (r << 20) | (g << 10) | b;
+            colorCounts.set(key, (colorCounts.get(key) || 0) + 1);
         }
 
         // Sort by count
-        const sortedColors = Object.entries(colorCounts)
+        const sortedColors = Array.from(colorCounts.entries())
             .sort((a, b) => b[1] - a[1])
-            .map(([key]) => key.split(',').map(Number));
+            .map(([key]) => [
+                (key >> 20) & 0x3FF,
+                (key >> 10) & 0x3FF,
+                key & 0x3FF
+            ]);
 
         // Filter out grays/whites/blacks for more vibrant themes if possible, fallback to most common
         let vibrantColors = sortedColors.filter(c => {
