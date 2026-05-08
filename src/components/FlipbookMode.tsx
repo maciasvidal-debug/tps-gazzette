@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { GazzetteState } from '../types/gazzette';
 import { MarkdownText } from './MarkdownText';
+import { validateUrl } from '../utils/url';
 import { Vignette } from './Vignette';
 
 interface Props {
@@ -85,7 +86,7 @@ export const FlipbookMode: React.FC<Props> = ({ state, onClose }) => {
                         <p className="text-sm italic mt-2 text-gray-600 border-l-2 pl-3" style={{ borderColor: theme.accent2 }}>{state.spotlight.caption}</p>
                       )}
                       {state.spotlight.link && (
-                         <a href={state.spotlight.link} target="_blank" rel="noreferrer" className="inline-block mt-3 px-4 py-2 text-white text-xs font-bold uppercase tracking-wider rounded" style={{ backgroundColor: theme.primary }}>
+                         <a href={validateUrl(state.spotlight.link)} target="_blank" rel="noopener noreferrer" className="inline-block mt-3 px-4 py-2 text-white text-xs font-bold uppercase tracking-wider rounded" style={{ backgroundColor: theme.primary }}>
                             Explore Interactive Content →
                          </a>
                       )}
@@ -135,7 +136,7 @@ export const FlipbookMode: React.FC<Props> = ({ state, onClose }) => {
                        <MarkdownText text={state.secondaryArticle1.content} />
                     </div>
                     {state.secondaryArticle1.link && (
-                       <a href={state.secondaryArticle1.link} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 text-white text-xs font-bold uppercase tracking-wider rounded" style={{ backgroundColor: theme.accent1 }}>
+                       <a href={validateUrl(state.secondaryArticle1.link)} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 text-white text-xs font-bold uppercase tracking-wider rounded" style={{ backgroundColor: theme.accent1 }}>
                           Take the Quiz →
                        </a>
                     )}
