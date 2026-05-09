@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { GazzetteState } from '../types/gazzette';
+import { logger } from '../utils/logger';
 
 const STORAGE_KEY = 'tps_gazzette_draft';
 
@@ -66,7 +67,7 @@ export function useGazzetteState() {
       try {
         return JSON.parse(saved) as GazzetteState;
       } catch (e) {
-        console.error('Failed to parse saved state:', e);
+        logger.error('Failed to parse saved state:', e);
       }
     }
     return defaultState;
