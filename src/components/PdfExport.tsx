@@ -13,6 +13,7 @@ import {
   Rect
 } from '@react-pdf/renderer';
 import type { GazzetteState } from '../types/gazzette';
+import { logger } from '../utils/logger';
 
 Font.register({
   family: 'Lora',
@@ -449,7 +450,7 @@ export const exportPdf = async (state: GazzetteState, mode: 'digital' | 'print' 
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error("Error generating PDF:", error);
+    logger.error("Error generating PDF:", error);
     throw new Error("Failed to generate PDF. Check console for details.", { cause: error });
   }
 };

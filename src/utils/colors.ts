@@ -1,3 +1,5 @@
+import { logger } from './logger';
+
 export const extractColorsFromImage = (imageUrl: string): Promise<number[][]> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -68,13 +70,13 @@ export const extractColorsFromImage = (imageUrl: string): Promise<number[][]> =>
         resolve(vibrantColors.slice(0, 5));
 
       } catch (err) {
-        console.error("Error extracting colors:", err);
+        logger.error("Error extracting colors:", err);
         reject(err);
       }
     };
 
     img.onerror = (err) => {
-      console.error("Failed to load image for color extraction", err);
+      logger.error("Failed to load image for color extraction", err);
       reject(new Error("Failed to load image"));
     };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { extractColorsFromImage, rgbToHex } from '../utils/colors';
 import type { GazzetteState } from '../types/gazzette';
+import { logger } from '../utils/logger';
 
 interface Props {
   imageUrl: string;
@@ -9,10 +10,12 @@ interface Props {
 
 export const ColorExtractor: React.FC<Props> = ({ imageUrl, updateState }) => {
   const [isExtracting, setIsExtracting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleExtract = async () => {
     if (!imageUrl) return;
     setIsExtracting(true);
+    setError(null);
     try {
       const palette = await extractColorsFromImage(imageUrl);
       if (palette && palette.length >= 3) {
@@ -27,21 +30,27 @@ export const ColorExtractor: React.FC<Props> = ({ imageUrl, updateState }) => {
         });
       }
     } catch (e) {
-      console.error("Failed to extract colors:", e);
+      logger.error("Failed to extract colors:", e);
+      setError("Could not extract colors from this image. Please try another one.");
     } finally {
       setIsExtracting(false);
     }
   };
 
   return (
-    <button
-      onClick={handleExtract}
-      disabled={isExtracting || !imageUrl}
-      className="w-full mt-2 bg-[#343541] hover:bg-[#4B4C56] text-[#E5E7EB] py-2 px-3 rounded text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed border border-[#4B4C56]"
-      title="Extract colors from image to theme the Gazzette"
-    >
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
-      {isExtracting ? 'Extracting...' : 'Smart Theme from Image'}
-    </button>
+    <div className="w-full">
+      <button
+        onClick={handleExtract}
+        disabled={isExtracting || !imageUrl}
+        className="w-full mt-2 bg-[#343541] hover:bg-[#4B4C56] text-[#E5E7EB] py-2 px-3 rounded text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed border border-[#4B4C56]"
+        title="Extract colors from image to theme the Gazzette"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+        {isExtracting ? 'Extracting...' : 'Smart Theme from Image'}
+      </button>
+      {error && (
+        <p className="text-[#ED6A5E] text-[10px] mt-1 italic">{error}</p>
+      )}
+    </div>
   );
 };
