@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { produce } from 'immer';
 import type { GazzetteState } from '../types/gazzette';
 import { logger } from '../utils/logger';
 
@@ -78,11 +79,7 @@ export function useGazzetteState() {
   }, [state]);
 
   const updateState = (updater: (draft: GazzetteState) => void | GazzetteState) => {
-    setState((prev) => {
-      const nextState = structuredClone(prev);
-      const result = updater(nextState);
-      return result || nextState;
-    });
+    setState((prev) => produce(prev, updater) as GazzetteState);
   };
 
   const resetState = () => {
