@@ -6,7 +6,7 @@
 
 type LogLevel = 'info' | 'warn' | 'error';
 
-const log = (level: LogLevel, message: string, ...args: any[]) => {
+const log = (level: LogLevel, message: string, ...args: unknown[]) => {
   // In a real production environment, we might want to check the environment
   // and decide whether to log or send to an external service.
   const timestamp = new Date().toISOString();
@@ -26,7 +26,7 @@ const log = (level: LogLevel, message: string, ...args: any[]) => {
 };
 
 export const logger = {
-  info: (message: string, ...args: any[]) => log('info', message, ...args),
-  warn: (message: string, ...args: any[]) => log('warn', message, ...args),
-  error: (message: string, ...args: any[]) => log('error', message, ...args),
+  info: (message: string, ...args: unknown[]) => log('info', message, ...args),
+  warn: (message: string, ...args: unknown[]) => log('warn', message, ...args),
+  error: (message: string, ...args: unknown[]) => log('error', message, ...args),
 };
