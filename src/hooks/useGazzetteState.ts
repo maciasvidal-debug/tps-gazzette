@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { produce } from 'immer';
 import type { GazzetteState } from '../types/gazzette';
 import { logger } from '../utils/logger';
 
@@ -75,11 +74,18 @@ export function useGazzetteState() {
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }, 1000);
+    return () => clearTimeout(timeoutId);
   }, [state]);
 
   const updateState = (updater: (draft: GazzetteState) => void | GazzetteState) => {
-    setState((prev) => produce(prev, updater) as GazzetteState);
+    setState((prev) => {
+      const draft = structuredClone(prev);
+      const result = updater(draft);
+      return (result !== undefined ? result : draft) as GazzetteState;
+    });
   };
 
   const resetState = () => {
