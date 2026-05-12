@@ -7,7 +7,7 @@ import { FlipbookMode } from './components/FlipbookMode';
 
 function App() {
   const { state, updateState, resetState } = useGazzetteState();
-  const printRef = useRef<HTMLDivElement>(null);
+
   const [zoom, setZoom] = useState(0.85);
   const [sidebarWidth, setSidebarWidth] = useState(384); // Default 96rem/w-96 is 384px
   const isResizing = useRef(false);
@@ -129,7 +129,7 @@ function App() {
         {/* Scrollable Preview Area */}
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#2C2D35] flex items-start justify-center p-8">
           <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}>
-            <GazzettePreview ref={printRef} state={state} updateState={updateState} />
+            <GazzettePreview state={state} updateState={updateState} />
           </div>
         </div>
       </main>
