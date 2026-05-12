@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import type { GazzetteState, TransformState } from '../types/gazzette';
 import { Vignette } from './Vignette';
 import { MarkdownText } from './MarkdownText';
@@ -11,7 +11,7 @@ interface PreviewProps {
   updateState?: (updater: (draft: GazzetteState) => void | GazzetteState) => void;
 }
 
-export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state, updateState }, ref) => {
+export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) => {
   const handleTransformChange = (id: string, transform: TransformState) => {
     if (updateState) {
       handleUpdate(draft => {
@@ -31,7 +31,7 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
   const isFree = !!state.freeDesignMode;
 
   return (
-    <div className="flex flex-col gap-12 items-center bg-transparent pb-16" ref={ref}>
+    <div className="flex flex-col gap-12 items-center bg-transparent pb-16" >
       {/* PAGE 1: Front Cover / Main Story Start */}
       <div 
         className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0"
@@ -281,6 +281,5 @@ export const GazzettePreview = forwardRef<HTMLDivElement, PreviewProps>(({ state
       </div>
     </div>
   );
-});
+};
 
-GazzettePreview.displayName = 'GazzettePreview';
