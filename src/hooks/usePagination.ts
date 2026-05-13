@@ -1,48 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import type { RefObject } from 'react';
 
-// Measure how many paragraphs fit into a given container height.
 export const usePagination = (
   contentRef: RefObject<HTMLDivElement | null>,
-  paragraphs: string[],
+  dependencies: unknown[],
   maxHeight: number
 ) => {
   const [splitIndex, setSplitIndex] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!contentRef.current) return;
-
-    // Simple height check: if the content is taller than max height, find where to split.
+  // useLayoutEffect runs synchronously after DOM mutations but before browser paint
+  useLayoutEffect(() => {
     const container = contentRef.current;
+    if (!container) return;
 
-    // Reset index to measure full height
+    // Reset any previous splits
     setSplitIndex(null);
 
-    // Give DOM a frame to render the full text
-    requestAnimationFrame(() => {
+    // Wait a brief moment to ensure all React renders (like Markdown conversions) are done
+    const timer = setTimeout(() => {
       if (!container) return;
 
-      const totalHeight = container.scrollHeight;
+      const children = Array.from(container.children) as HTMLElement[];
+      if (children.length === 0) return;
 
-      if (totalHeight > maxHeight) {
-        // Find which child paragraph pushes it over the edge
-        let accumulatedHeight = 0;
-        const children = Array.from(container.children);
+      // Make all children visible to measure true height
+      children.forEach(c => { c.style.display = ''; });
 
-        for (let i = 0; i < children.length; i++) {
-          const child = children[i] as HTMLElement;
-          const childHeight = child.offsetHeight + parseFloat(window.getComputedStyle(child).marginBottom);
+      const isOverflowing = () => container.scrollHeight > maxHeight;
 
-          if (accumulatedHeight + childHeight > maxHeight) {
-            // Split here. Ensure at least one paragraph stays if it's huge.
-            setSplitIndex(Math.max(1, i));
-            return;
-          }
-          accumulatedHeight += childHeight;
-        }
+      if (!isOverflowing()) {
+        setSplitIndex(null);
+        return;
       }
-    });
-  }, [paragraphs, maxHeight, contentRef]);
+
+      // Hide children from the end one by one until it fits
+      let i = children.length - 1;
+      while (i > 0 && isOverflowing()) {
+        children[i].style.display = 'none';
+        i--;
+      }
+
+      // The split index is the first element that was hidden (i + 1)
+      // Math.max guarantees we show at least one element.
+      const indexToSplit = Math.max(1, i + 1);
+
+      // Restore displays so React can manage them properly going forward
+      children.forEach(c => { c.style.display = ''; });
+
+      setSplitIndex(indexToSplit);
+    }, 50); // Give fonts/styles a tiny bit of time to settle
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...dependencies, maxHeight, contentRef]);
 
   return splitIndex;
 };
