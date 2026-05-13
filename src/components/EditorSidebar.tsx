@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import type { GazzetteState } from '../types/gazzette';
 import { AccordionSection, FormInput, FormTextArea, FormSelect } from './FormElements';
 import { ColorExtractor } from './ColorExtractor';
-import { AICopilotButton } from './AICopilotButton';
-import { generateQuote, generateFeelGood, summarizeText, improveTone } from '../utils/aiCopilot';
 
 interface EditorSidebarProps {
   state: GazzetteState;
@@ -265,20 +263,8 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
                   <button onClick={() => removeParagraph(i)} className="text-[#ED6A5E] hover:bg-[#343541] px-2 rounded h-fit">×</button>
                 </div>
                 <div className="flex gap-2 justify-end">
-                  <AICopilotButton
-                    label="Summarize"
-                    onClick={async () => {
-                      const summary = await summarizeText(p);
-                      handleParagraphChange(i, summary);
-                    }}
-                  />
-                  <AICopilotButton
-                    label="Prof. Tone"
-                    onClick={async () => {
-                      const improved = await improveTone(p, 'professional');
-                      handleParagraphChange(i, improved);
-                    }}
-                  />
+
+
                 </div>
               </div>
             ))}
@@ -369,17 +355,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           onToggle={() => toggleSection('quote')}
         >
           <div className="flex justify-end mb-2">
-             <AICopilotButton
-               label="Generate Corporate Quote"
-               variant="primary"
-               onClick={async () => {
-                 const newQuote = await generateQuote();
-                 updateState(draft => {
-                   draft.quote.text = newQuote.text;
-                   draft.quote.author = newQuote.author;
-                 });
-               }}
-             />
+
           </div>
           <FormTextArea
             label="Text"
@@ -401,16 +377,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           onToggle={() => toggleSection('feelGood')}
         >
           <div className="flex justify-end mb-2">
-             <AICopilotButton
-               label="Generate Feel Good Text"
-               variant="primary"
-               onClick={async () => {
-                 const newText = await generateFeelGood();
-                 updateState(draft => {
-                   draft.feelGoodCorner = newText;
-                 });
-               }}
-             />
+
           </div>
           <FormTextArea
             label="Text"

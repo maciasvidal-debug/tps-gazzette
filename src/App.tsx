@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useGazzetteState } from './hooks/useGazzetteState';
 import { EditorSidebar } from './components/EditorSidebar';
+import { AiAssistant } from './components/AiAssistant';
 import { GazzettePreview } from './components/GazzettePreview';
 import { exportPdf } from './components/PdfExport';
 import { FlipbookMode } from './components/FlipbookMode';
@@ -127,7 +128,8 @@ function App() {
         </div>
 
         {/* Scrollable Preview Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#2C2D35] flex items-start justify-center p-8">
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#2C2D35] flex items-start justify-center p-8 relative">
+          <AiAssistant currentState={state} updateState={updateState} />
           <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}>
             <GazzettePreview state={state} updateState={updateState} />
           </div>
