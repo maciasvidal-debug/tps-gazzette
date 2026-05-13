@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { FloatingToolbar } from './editor/FloatingToolbar';
 
 export const AccordionSection: React.FC<{
   title: string;
@@ -52,18 +53,48 @@ export const FormInput: React.FC<React.InputHTMLAttributes<HTMLInputElement> & F
   );
 };
 
+
 export const FormTextArea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement> & FormElementProps> = ({
   label,
   containerClassName = "",
+  value,
+  onChange,
   ...props
 }) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleInsertFormat = (formattedText: string, cursorOffset: number) => {
+    const el = textareaRef.current;
+    if (!el || !onChange) return;
+
+    const start = el.selectionStart || 0;
+    const end = el.selectionEnd || 0;
+    const currentVal = (value as string) || '';
+
+    const newValue = currentVal.substring(0, start) + formattedText + currentVal.substring(end);
+
+    // Create a synthetic event
+    const event = {
+      target: { value: newValue }
+    } as React.ChangeEvent<HTMLTextAreaElement>;
+
+    onChange(event);
+
+    setTimeout(() => {
+      el.focus();
+      el.setSelectionRange(cursorOffset, cursorOffset);
+    }, 0);
+  };
+
   return (
     <div className={containerClassName}>
       {label && <label className={labelClass}>{label}</label>}
-      <textarea className={inputClass} {...props} />
+      <textarea ref={textareaRef} className={inputClass} value={value} onChange={onChange} {...props} />
+      <FloatingToolbar textareaRef={textareaRef} onInsertFormat={handleInsertFormat} />
     </div>
   );
 };
+
 
 export const FormSelect: React.FC<React.SelectHTMLAttributes<HTMLSelectElement> & FormElementProps> = ({
   label,

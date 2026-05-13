@@ -14,7 +14,7 @@ interface PreviewProps {
 
 export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) => {
   const featureContentRef = useRef<HTMLDivElement>(null);
-  const splitIndex = usePagination(featureContentRef, state.featureStory.paragraphs, 600);
+  const splitIndex = usePagination(featureContentRef, state.featureStory.paragraphs, 850);
 
   const handleTransformChange = (id: string, transform: TransformState) => {
     if (updateState) {
