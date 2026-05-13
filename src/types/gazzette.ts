@@ -50,6 +50,12 @@ export interface TransformState {
   scale: [number, number];
 }
 
+export interface CustomTextBox {
+  id: string;
+  content: string;
+  page: 1 | 2;
+}
+
 export interface GazzetteState {
   feelGoodCorner?: string;
 
@@ -75,4 +81,5 @@ export interface GazzetteState {
   typography?: { serif: string; sans: string; baseSize: number; };
   transforms?: Record<string, TransformState>;
   freeDesignMode?: boolean;
+  customTextBoxes?: CustomTextBox[];
 }

@@ -1,4 +1,3 @@
-import { usePagination } from '../hooks/usePagination';
 import React, { useRef } from 'react';
 import type { GazzetteState, TransformState } from '../types/gazzette';
 import { Vignette } from './Vignette';
@@ -14,8 +13,6 @@ interface PreviewProps {
 
 export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) => {
   const featureContentRef = useRef<HTMLDivElement>(null);
-  const splitIndex = usePagination(featureContentRef, state.featureStory.paragraphs, 850);
-  const hasContinuation = splitIndex !== null && splitIndex < state.featureStory.paragraphs.length;
 
 
   const handleTransformChange = (id: string, transform: TransformState) => {
@@ -161,10 +158,9 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
                 By <EditableText tagName="span" value={state.featureStory.author} onChange={(val) => handleUpdate(draft => { draft.featureStory.author = val; })} />
               </div>
               
-              <div ref={featureContentRef} className={`gap-8 font-serif text-sm leading-relaxed text-gray-800 editorial-text ${state.layoutTemplate === 'modern' ? 'columns-3' : 'columns-2'}`}>
+              <div ref={featureContentRef} className={`gap-8 font-serif text-sm leading-relaxed text-gray-800 editorial-text ${state.layoutTemplate === 'modern' ? 'columns-3' : 'columns-2'} overflow-hidden max-h-[850px]`}>
 
                 {state.featureStory.paragraphs.map((p, i) => {
-                  if (splitIndex !== null && i >= splitIndex) return null; // Hide overflowing items on page 1
 
                   if (i === 0) {
                     return (
@@ -220,47 +216,35 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
         </div>
       </div>
 
-      {/* PAGE 2: Auto-Paginated Overflow (Continuation) */}
-      {splitIndex !== null && splitIndex < state.featureStory.paragraphs.length && (
-        <div
-          className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0 mt-8"
-          id="gazzette-document-page2"
-        >
-          <div className="px-12 py-10 h-full flex flex-col">
-            <header className="mb-8 border-b-[3px] border-tps-text pb-4">
-               <h2 className="font-serif text-3xl font-bold text-tps-text uppercase">
-                 {state.featureStory.headline} (Continued)
-               </h2>
-            </header>
-            <div className={`gap-8 font-serif text-sm leading-relaxed text-gray-800 editorial-text ${state.layoutTemplate === 'modern' ? 'columns-3' : 'columns-2'}`}>
-               {state.featureStory.paragraphs.slice(splitIndex).map((p, index) => {
-                 const originalIndex = splitIndex + index;
-                 return (
-                   <React.Fragment key={originalIndex}>
-                      <p className="mb-4 editorial-text"><MarkdownText text={p} /></p>
-                      {originalIndex === state.featureStory.pullQuotePosition && state.featureStory.pullQuote && (
-                        <blockquote className="my-6 py-4 border-y-[1px] border-tps-quote font-serif text-xl italic text-tps-quote text-center px-4 font-bold break-inside-avoid">
-                          "{state.featureStory.pullQuote}"
-                        </blockquote>
-                      )}
-                    </React.Fragment>
-                 );
-               })}
-            </div>
-            <div className="mt-auto flex justify-between items-center text-[10px] text-gray-400 font-sans tracking-widest pt-4 border-t-[1px] border-gray-200">
-              <span>{state.masthead.title}</span>
-              <span>PAGE 2</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-
-{/* PAGE 3: Secondary Content (or Page 2 if no overflow) */}
+      {/* PAGE 2: Secondary Content */}
       <div
         className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0"
-        id={hasContinuation ? "gazzette-document-page3" : "gazzette-document-page2"}
+        id="gazzette-document-page2"
       >
+
+          {state.customTextBoxes?.filter(b => b.page === 2).map(box => (
+            <MoveableWrapper
+              key={box.id}
+              id={box.id}
+              isActive={!!state.freeDesignMode}
+              initialTransform={state.transforms?.[box.id]}
+              onTransformChange={handleTransformChange}
+              className="absolute z-40 p-2"
+            >
+              <div className="font-serif text-sm leading-relaxed text-gray-800 editorial-text bg-white/80 backdrop-blur-sm border border-transparent hover:border-gray-300">
+                <EditableText
+                  tagName="div"
+                  multiline
+                  value={box.content}
+                  onChange={(val) => handleUpdate(draft => {
+                    const b = draft.customTextBoxes?.find(x => x.id === box.id);
+                    if (b) b.content = val;
+                  })}
+                />
+              </div>
+            </MoveableWrapper>
+          ))}
+
         <div className="px-12 py-10 h-full flex flex-col">
           <header className="mb-12 border-b-[3px] border-tps-text pb-4 flex justify-between items-end mt-4">
             <h2 className="font-serif text-4xl font-bold text-tps-text uppercase">
@@ -273,7 +257,7 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
 
           {/* SYMMETRICAL BOTTOM LAYOUT 6:6 */}
           <div className="grid grid-cols-12 gap-12 flex-1">
-            <div className="col-span-6 pr-4">
+            <MoveableWrapper id="secondary1" isActive={!!state.freeDesignMode} initialTransform={state.transforms?.secondary1} onTransformChange={handleTransformChange} className="col-span-6 pr-4">
               <div className="font-sans text-[10px] font-bold uppercase tracking-widest text-tps-text mb-3 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-tps-accent1"></div>
                 <EditableText tagName="span" value={state.secondaryArticle1.kicker} onChange={(val) => handleUpdate(draft => { draft.secondaryArticle1.kicker = val; })} />
@@ -291,9 +275,9 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
                    </div>
                 </div>
               )}
-            </div>
+            </MoveableWrapper>
 
-            <div className="col-span-6 pl-4 border-l-[1px] border-tps-text">
+            <MoveableWrapper id="secondary2" isActive={!!state.freeDesignMode} initialTransform={state.transforms?.secondary2} onTransformChange={handleTransformChange} className="col-span-6 pl-4 border-l-[1px] border-tps-text">
               <div className="font-sans text-[10px] font-bold uppercase tracking-widest text-tps-text mb-3 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-tps-accent2"></div>
                 <EditableText tagName="span" value={state.secondaryArticle2.kicker} onChange={(val) => handleUpdate(draft => { draft.secondaryArticle2.kicker = val; })} />
@@ -302,7 +286,7 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
               <div className="columns-1 gap-6 font-serif text-sm leading-relaxed text-gray-800 editorial-text">
                 <p className="editorial-text"><MarkdownText text={state.secondaryArticle2.content} /></p>
               </div>
-            </div>
+            </MoveableWrapper>
           </div>
           
           {/* FEEL GOOD CORNER (MAIN BLOCK) */}
@@ -318,7 +302,7 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
 
           <div className="mt-auto flex justify-between items-center text-[10px] text-gray-400 font-sans tracking-widest pt-4 border-t-[1px] border-gray-200 mb-8">
             <span><EditableText tagName="span" value={state.masthead.title} onChange={(val) => handleUpdate(draft => { draft.masthead.title = val; })} /></span>
-            <span>PAGE {hasContinuation ? "3" : "2"}</span>
+            <span>PAGE 2</span>
           </div>
         </div>
 

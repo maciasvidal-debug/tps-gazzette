@@ -150,6 +150,30 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
         </AccordionSection>
 
         {/* MASTHEAD SECTION */}
+
+        <AccordionSection
+          title="Document Design Mode"
+          isOpen={openSection === 'designMode'}
+          onToggle={() => toggleSection('designMode')}
+        >
+          <div className="flex items-center gap-3 bg-[#2A2A35] p-4 rounded-md border border-[#3A3A45]">
+            <input
+              type="checkbox"
+              id="freeDesignMode"
+              checked={!!state.freeDesignMode}
+              onChange={(e) => updateState(draft => { draft.freeDesignMode = e.target.checked; })}
+              className="w-4 h-4 rounded text-tps-primary focus:ring-tps-primary bg-[#1A1A1E] border-gray-600"
+            />
+            <label htmlFor="freeDesignMode" className="text-sm text-gray-200 font-medium">
+              Enable Free Design Mode (Drag & Drop)
+            </label>
+          </div>
+          <p className="text-xs text-gray-400 mt-2 italic">
+            When enabled, you can drag, resize, and freely position elements on the document canvas just like InDesign.
+          </p>
+        </AccordionSection>
+
+
         <AccordionSection
           title="Masthead"
           isOpen={openSection === 'masthead'}
@@ -422,6 +446,66 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
           </div>
         </AccordionSection>
       </div>
+
+        <AccordionSection
+          title="Custom Text Boxes"
+          isOpen={openSection === 'customTextBoxes'}
+          onToggle={() => toggleSection('customTextBoxes')}
+        >
+          <div className="space-y-4">
+            <button
+              onClick={() => updateState(draft => {
+                if (!draft.customTextBoxes) draft.customTextBoxes = [];
+                draft.customTextBoxes.push({
+                  id: 'box_' + Date.now(),
+                  content: 'New Text Box',
+                  page: 1
+                });
+              })}
+              className="w-full bg-[#ED6A5E] hover:bg-[#d95c52] text-white font-bold py-2 px-4 rounded text-xs uppercase tracking-wider"
+            >
+              + Add Text Box
+            </button>
+
+            {state.customTextBoxes?.map((box, idx) => (
+              <div key={box.id} className="p-3 border border-gray-600 rounded bg-[#2A2A35]">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs text-gray-300 font-bold uppercase">Box {idx + 1}</span>
+                  <button
+                    onClick={() => updateState(draft => {
+                      draft.customTextBoxes?.splice(idx, 1);
+                    })}
+                    className="text-red-400 hover:text-red-300 text-xs"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <FormSelect
+                  value={box.page}
+                  onChange={(e) => updateState(draft => {
+                     if (draft.customTextBoxes) draft.customTextBoxes[idx].page = parseInt(e.target.value) as 1 | 2;
+                  })}
+                  className="mb-2 w-full bg-[#1A1A1E] text-xs text-white p-1 rounded border border-gray-500"
+                >
+                  <option value={1}>Page 1</option>
+                  <option value={2}>Page 2</option>
+                </FormSelect>
+                <FormTextArea
+                  value={box.content}
+                  onChange={(e) => updateState(draft => {
+                    if (draft.customTextBoxes) draft.customTextBoxes[idx].content = e.target.value;
+                  })}
+                  rows={3}
+                />
+              </div>
+            ))}
+
+            {(!state.customTextBoxes || state.customTextBoxes.length === 0) && (
+              <p className="text-xs text-gray-500 text-center italic">No custom text boxes. Add one to freely place text anywhere!</p>
+            )}
+          </div>
+        </AccordionSection>
+
 
       <div className="p-4 bg-[#1A1A1E] border-t border-[#2C2D35] mt-auto">
         <div className="flex gap-2 mb-3">
