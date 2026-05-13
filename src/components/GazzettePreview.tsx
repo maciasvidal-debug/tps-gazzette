@@ -15,6 +15,8 @@ interface PreviewProps {
 export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) => {
   const featureContentRef = useRef<HTMLDivElement>(null);
   const splitIndex = usePagination(featureContentRef, state.featureStory.paragraphs, 850);
+  const hasContinuation = splitIndex !== null && splitIndex < state.featureStory.paragraphs.length;
+
 
   const handleTransformChange = (id: string, transform: TransformState) => {
     if (updateState) {
@@ -218,10 +220,46 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
         </div>
       </div>
 
-      {/* PAGE 2: Secondary Content */}
+      {/* PAGE 2: Auto-Paginated Overflow (Continuation) */}
+      {splitIndex !== null && splitIndex < state.featureStory.paragraphs.length && (
+        <div
+          className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0 mt-8"
+          id="gazzette-document-page2"
+        >
+          <div className="px-12 py-10 h-full flex flex-col">
+            <header className="mb-8 border-b-[3px] border-tps-text pb-4">
+               <h2 className="font-serif text-3xl font-bold text-tps-text uppercase">
+                 {state.featureStory.headline} (Continued)
+               </h2>
+            </header>
+            <div className={`gap-8 font-serif text-sm leading-relaxed text-gray-800 editorial-text ${state.layoutTemplate === 'modern' ? 'columns-3' : 'columns-2'}`}>
+               {state.featureStory.paragraphs.slice(splitIndex).map((p, index) => {
+                 const originalIndex = splitIndex + index;
+                 return (
+                   <React.Fragment key={originalIndex}>
+                      <p className="mb-4 editorial-text"><MarkdownText text={p} /></p>
+                      {originalIndex === state.featureStory.pullQuotePosition && state.featureStory.pullQuote && (
+                        <blockquote className="my-6 py-4 border-y-[1px] border-tps-quote font-serif text-xl italic text-tps-quote text-center px-4 font-bold break-inside-avoid">
+                          "{state.featureStory.pullQuote}"
+                        </blockquote>
+                      )}
+                    </React.Fragment>
+                 );
+               })}
+            </div>
+            <div className="mt-auto flex justify-between items-center text-[10px] text-gray-400 font-sans tracking-widest pt-4 border-t-[1px] border-gray-200">
+              <span>{state.masthead.title}</span>
+              <span>PAGE 2</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+{/* PAGE 3: Secondary Content (or Page 2 if no overflow) */}
       <div
         className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0"
-        id="gazzette-document-page2"
+        id={hasContinuation ? "gazzette-document-page3" : "gazzette-document-page2"}
       >
         <div className="px-12 py-10 h-full flex flex-col">
           <header className="mb-12 border-b-[3px] border-tps-text pb-4 flex justify-between items-end mt-4">
@@ -280,48 +318,14 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
 
           <div className="mt-auto flex justify-between items-center text-[10px] text-gray-400 font-sans tracking-widest pt-4 border-t-[1px] border-gray-200 mb-8">
             <span><EditableText tagName="span" value={state.masthead.title} onChange={(val) => handleUpdate(draft => { draft.masthead.title = val; })} /></span>
-            <span>PAGE 2</span>
+            <span>PAGE {hasContinuation ? "3" : "2"}</span>
           </div>
         </div>
 
 
             </div>
 
-      {/* PAGE 3: Auto-Paginated Overflow */}
-      {splitIndex !== null && splitIndex < state.featureStory.paragraphs.length && (
-        <div
-          className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0 mt-8"
-          id="gazzette-document-page3"
-        >
-          <div className="px-12 py-10 h-full flex flex-col">
-            <header className="mb-8 border-b-[3px] border-tps-text pb-4">
-               <h2 className="font-serif text-3xl font-bold text-tps-text uppercase">
-                 {state.featureStory.headline} (Continued)
-               </h2>
-            </header>
-            <div className={`gap-8 font-serif text-sm leading-relaxed text-gray-800 editorial-text ${state.layoutTemplate === 'modern' ? 'columns-3' : 'columns-2'}`}>
-               {state.featureStory.paragraphs.slice(splitIndex).map((p, index) => {
-                 const originalIndex = splitIndex + index;
-                 return (
-                   <React.Fragment key={originalIndex}>
-                      <p className="mb-4 editorial-text"><MarkdownText text={p} /></p>
-                      {originalIndex === state.featureStory.pullQuotePosition && state.featureStory.pullQuote && (
-                        <blockquote className="my-6 py-4 border-y-[1px] border-tps-quote font-serif text-xl italic text-tps-quote text-center px-4 font-bold break-inside-avoid">
-                          "{state.featureStory.pullQuote}"
-                        </blockquote>
-                      )}
-                    </React.Fragment>
-                 );
-               })}
-            </div>
-            <div className="mt-auto flex justify-between items-center text-[10px] text-gray-400 font-sans tracking-widest pt-4 border-t-[1px] border-gray-200">
-              <span>{state.masthead.title}</span>
-              <span>PAGE 3</span>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      </div>
   );
 };
 
