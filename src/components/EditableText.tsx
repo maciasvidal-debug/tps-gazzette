@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { FloatingToolbar } from './editor/FloatingToolbar';
 
 interface EditableTextProps {
   value: string;
@@ -20,8 +21,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // When the value prop changes from the outside, sync it locally if not currently editing.
-  // We use standard check during render instead of useEffect to avoid cascading renders.
   if (!isEditing && currentValue !== value) {
     setCurrentValue(value);
   }
@@ -30,7 +29,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
     if (isEditing) {
       if (multiline && textareaRef.current) {
         textareaRef.current.focus();
-        // Auto-resize
         textareaRef.current.style.height = 'auto';
         textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
       } else if (!multiline && inputRef.current) {
@@ -40,16 +38,20 @@ export const EditableText: React.FC<EditableTextProps> = ({
   }, [isEditing, multiline]);
 
   const handleBlur = () => {
-    setIsEditing(false);
-    if (currentValue !== value) {
-      onChange(currentValue);
-    }
+    // Delay blur slightly to allow toolbar button clicks to process
+    setTimeout(() => {
+      setIsEditing(false);
+      if (currentValue !== value) {
+        onChange(currentValue);
+      }
+    }, 200);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !multiline) {
       e.preventDefault();
-      handleBlur();
+      setIsEditing(false);
+      onChange(currentValue);
     }
     if (e.key === 'Escape') {
       setIsEditing(false);
@@ -57,36 +59,60 @@ export const EditableText: React.FC<EditableTextProps> = ({
     }
   };
 
+  const handleInsertFormat = (formattedText: string, cursorOffset: number) => {
+     const ref = multiline ? textareaRef : inputRef;
+     const el = ref.current;
+     if (!el) return;
+
+     const start = el.selectionStart || 0;
+     const end = el.selectionEnd || 0;
+
+     const newValue = currentValue.substring(0, start) + formattedText + currentValue.substring(end);
+     setCurrentValue(newValue);
+
+     // Set cursor after the newly formatted block
+     setTimeout(() => {
+        el.focus();
+        el.setSelectionRange(cursorOffset, cursorOffset);
+     }, 0);
+  };
+
   const commonClasses = `w-full bg-transparent border border-dashed border-[#ED6A5E] focus:outline-none focus:border-solid focus:border-[#ED6A5E] ${className}`;
 
   if (isEditing) {
     if (multiline) {
       return (
-        <textarea
-          ref={textareaRef}
-          value={currentValue}
-          onChange={(e) => {
-             setCurrentValue(e.target.value);
-             e.target.style.height = 'auto';
-             e.target.style.height = e.target.scrollHeight + 'px';
-          }}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          className={`${commonClasses} resize-none overflow-hidden`}
-          rows={1}
-        />
+        <>
+          <textarea
+            ref={textareaRef}
+            value={currentValue}
+            onChange={(e) => {
+               setCurrentValue(e.target.value);
+               e.target.style.height = 'auto';
+               e.target.style.height = e.target.scrollHeight + 'px';
+            }}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            className={`${commonClasses} resize-none overflow-hidden`}
+            rows={1}
+          />
+          <FloatingToolbar textareaRef={textareaRef} onInsertFormat={handleInsertFormat} />
+        </>
       );
     }
     return (
-      <input
-        ref={inputRef}
-        type="text"
-        value={currentValue}
-        onChange={(e) => setCurrentValue(e.target.value)}
-        onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
-        className={commonClasses}
-      />
+      <>
+        <input
+          ref={inputRef}
+          type="text"
+          value={currentValue}
+          onChange={(e) => setCurrentValue(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className={commonClasses}
+        />
+        <FloatingToolbar textareaRef={inputRef} onInsertFormat={handleInsertFormat} />
+      </>
     );
   }
 
@@ -95,10 +121,9 @@ export const EditableText: React.FC<EditableTextProps> = ({
       onClick={() => setIsEditing(true)}
       className={`${className} cursor-text hover:outline hover:outline-1 hover:outline-dashed hover:outline-gray-400 transition-all`}
       title="Click to edit"
+      dangerouslySetInnerHTML={Tag === 'span' || Tag === 'div' ? { __html: value || '<span class="text-gray-400 italic">Click to enter text...</span>' } : undefined}
     >
-      {value || (
-        <span className="text-gray-400 italic">Click to enter text...</span>
-      )}
+      {Tag !== 'span' && Tag !== 'div' ? (value || <span className="text-gray-400 italic">Click to enter text...</span>) : undefined}
     </Tag>
   );
 };
