@@ -20,6 +20,11 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // When the value prop changes from the outside, sync it locally if not currently editing.
+  // We use standard check during render instead of useEffect to avoid cascading renders.
+  if (!isEditing && currentValue !== value) {
+    setCurrentValue(value);
+  }
 
   useEffect(() => {
     if (isEditing) {
