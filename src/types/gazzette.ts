@@ -67,6 +67,13 @@ export interface CustomTextBox {
   zIndex?: number;
 }
 
+export interface Snapshot {
+  id: string;
+  name: string;
+  timestamp: string;
+  state: GazzetteState;
+}
+
 export interface GazzetteState {
   feelGoodCorner?: string;
 

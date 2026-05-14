@@ -1,0 +1,72 @@
+export function getWordCount(text: string): number {
+  if (!text) return 0;
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  return words.length;
+}
+
+export function getReadingTime(text: string): number {
+  const wordCount = getWordCount(text);
+  const wordsPerMinute = 225;
+  return Math.ceil(wordCount / wordsPerMinute);
+}
+
+function countSyllables(word: string): number {
+  word = word.toLowerCase();
+  if (word.length <= 3) return 1;
+
+  word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
+  word = word.replace(/^y/, '');
+
+  const syllables = word.match(/[aeiouy]{1,2}/g);
+  return syllables ? syllables.length : 1;
+}
+
+export function getFleschKincaidScore(text: string): number {
+  if (!text.trim()) return 0;
+
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length || 1;
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const wordCount = words.length || 1;
+  const syllablesCount = words.reduce((acc, word) => acc + countSyllables(word), 0);
+
+  const score = 206.835 - 1.015 * (wordCount / sentences) - 84.6 * (syllablesCount / wordCount);
+  return Math.max(0, Math.min(100, Math.round(score * 10) / 10)); // Clamp between 0 and 100
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const cleanHex = hex.replace('#', '');
+  const r = parseInt(cleanHex.substring(0, 2), 16);
+  const g = parseInt(cleanHex.substring(2, 4), 16);
+  const b = parseInt(cleanHex.substring(4, 6), 16);
+  return [r, g, b];
+}
+
+function getLuminance(r: number, g: number, b: number): number {
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+export function getContrastRatio(hex1: string, hex2: string): number {
+  try {
+    const rgb1 = hexToRgb(hex1);
+    const rgb2 = hexToRgb(hex2);
+
+    const lum1 = getLuminance(...rgb1);
+    const lum2 = getLuminance(...rgb2);
+
+    const brightest = Math.max(lum1, lum2);
+    const darkest = Math.min(lum1, lum2);
+
+    const ratio = (brightest + 0.05) / (darkest + 0.05);
+    return Math.round(ratio * 100) / 100;
+  } catch (e) {
+    return 1; // Fallback
+  }
+}
+
+export function passesWCAGAA(contrastRatio: number, isLargeText: boolean = false): boolean {
+  return isLargeText ? contrastRatio >= 3.0 : contrastRatio >= 4.5;
+}
