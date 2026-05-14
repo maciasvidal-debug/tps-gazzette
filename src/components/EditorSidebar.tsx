@@ -1,3 +1,4 @@
+import { exportInteractiveWeb } from '../utils/webExport';
 import React, { useState } from 'react';
 import type { GazzetteState } from '../types/gazzette';
 import { AccordionSection, FormInput, FormTextArea, FormSelect } from './FormElements';
@@ -447,6 +448,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
                     Remove
                   </button>
                 </div>
+                <div className="flex gap-2 mb-2">
                 <FormSelect
                   value={box.page}
                   onChange={(e) => updateState(draft => {
@@ -457,6 +459,25 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
                   <option value={1}>Page 1</option>
                   <option value={2}>Page 2</option>
                 </FormSelect>
+                <button
+                    title="Send backward"
+                    onClick={() => updateState(draft => {
+                      if (draft.customTextBoxes) draft.customTextBoxes[idx].zIndex = (box.zIndex || 30) - 1;
+                    })}
+                    className="px-2 bg-gray-700 hover:bg-gray-600 rounded text-white"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    title="Bring forward"
+                    onClick={() => updateState(draft => {
+                      if (draft.customTextBoxes) draft.customTextBoxes[idx].zIndex = (box.zIndex || 30) + 1;
+                    })}
+                    className="px-2 bg-gray-700 hover:bg-gray-600 rounded text-white"
+                  >
+                    ↑
+                  </button>
+                </div>
                 <FormTextArea
                   value={box.content}
                   onChange={(e) => updateState(draft => {
@@ -489,6 +510,21 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
             Print (QR/Bleed)
           </button>
         </div>
+
+        <button
+          onClick={async () => {
+             try {
+               await exportInteractiveWeb(state);
+             } catch (e) {
+               console.error(e);
+             }
+          }}
+          className="w-full bg-[#3c2065] hover:bg-[#5e3898] text-white py-3 px-4 rounded text-sm font-bold transition-colors flex items-center justify-center gap-2 mb-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+          Export Interactive Web (HTML)
+        </button>
+
         <button
           onClick={() => onExportPdf(exportMode)}
           className="w-full bg-[#E5484D] hover:bg-[#F2555A] text-white py-3 px-4 rounded text-sm font-bold transition-colors flex items-center justify-center gap-2"
