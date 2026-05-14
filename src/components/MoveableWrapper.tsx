@@ -68,6 +68,9 @@ export const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
           keepRatio={true}
           snappable={true}
           snapCenter={true}
+          elementGuidelines={['.cursor-move']}
+          verticalGuidelines={[0, 512, 1024]}
+          horizontalGuidelines={[0, 724, 1448]}
           onDrag={e => {
             setTransform(prev => ({ ...prev, translate: e.beforeTranslate as [number, number] }));
           }}

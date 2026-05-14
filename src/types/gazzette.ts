@@ -56,6 +56,8 @@ export interface CustomImageBox {
   url: string;
   page: 1 | 2;
   zIndex?: number;
+  shape?: 'rectangle' | 'circle' | 'rounded';
+  filter?: 'none' | 'grayscale' | 'sepia' | 'blur';
 }
 
 export interface CustomTextBox {
