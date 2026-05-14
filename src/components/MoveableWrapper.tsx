@@ -9,6 +9,7 @@ interface MoveableWrapperProps {
   initialTransform?: TransformState;
   onTransformChange: (id: string, transform: TransformState) => void;
   className?: string;
+  zIndex?: number;
 }
 
 export const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
@@ -17,7 +18,8 @@ export const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
   isActive,
   initialTransform,
   onTransformChange,
-  className = ""
+  className = "",
+  zIndex
 }) => {
   const targetRef = useRef<HTMLDivElement>(null);
   const [target, setTarget] = useState<HTMLElement | null>(null);
@@ -51,7 +53,7 @@ export const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
       <div
         ref={targetRef}
         className={`${className} ${isActive ? 'cursor-move hover:outline hover:outline-2 hover:outline-blue-500/50' : ''}`}
-        style={{ zIndex: isActive ? 50 : 'auto', position: 'relative' }}
+        style={{ zIndex: zIndex !== undefined ? zIndex : (isActive ? 50 : 'auto'), position: 'relative' }}
       >
         {children}
       </div>

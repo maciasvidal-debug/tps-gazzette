@@ -50,10 +50,19 @@ export interface TransformState {
   scale: [number, number];
 }
 
+
+export interface CustomImageBox {
+  id: string;
+  url: string;
+  page: 1 | 2;
+  zIndex?: number;
+}
+
 export interface CustomTextBox {
   id: string;
   content: string;
   page: 1 | 2;
+  zIndex?: number;
 }
 
 export interface GazzetteState {
@@ -82,4 +91,5 @@ export interface GazzetteState {
   transforms?: Record<string, TransformState>;
   freeDesignMode?: boolean;
   customTextBoxes?: CustomTextBox[];
+  customImageBoxes?: CustomImageBox[];
 }

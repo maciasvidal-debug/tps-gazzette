@@ -222,6 +222,20 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
         id="gazzette-document-page2"
       >
 
+
+          {state.customImageBoxes?.filter(b => b.page === 2).map(box => (
+            <MoveableWrapper
+              key={box.id}
+              id={box.id}
+              isActive={!!state.freeDesignMode}
+              initialTransform={state.transforms?.[box.id]}
+              onTransformChange={handleTransformChange}
+              className="absolute p-0"
+              zIndex={box.zIndex || 20}
+            >
+              <img src={box.url} alt="" className="max-w-xs pointer-events-none" />
+            </MoveableWrapper>
+          ))}
           {state.customTextBoxes?.filter(b => b.page === 2).map(box => (
             <MoveableWrapper
               key={box.id}
@@ -229,8 +243,10 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
               isActive={!!state.freeDesignMode}
               initialTransform={state.transforms?.[box.id]}
               onTransformChange={handleTransformChange}
-              className="absolute z-40 p-2"
+              className="absolute p-2"
+              zIndex={box.zIndex || 30}
             >
+
               <div className="font-serif text-sm leading-relaxed text-gray-800 editorial-text bg-white/80 backdrop-blur-sm border border-transparent hover:border-gray-300">
                 <EditableText
                   tagName="div"
