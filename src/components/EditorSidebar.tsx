@@ -14,7 +14,7 @@ interface EditorSidebarProps {
   state: GazzetteState;
   updateState: (updater: (draft: GazzetteState) => void) => void;
   resetState: () => void;
-  onExportPdf: (mode?: 'digital' | 'print') => void;
+  onExportPdf: (mode?: 'standard' | 'print' | 'pdf20') => void;
   snapshots?: Snapshot[];
   onSaveSnapshot?: (name: string) => void;
   onLoadSnapshot?: (id: string) => void;
@@ -23,7 +23,7 @@ interface EditorSidebarProps {
 
 export function EditorSidebar({ state, updateState, resetState, onExportPdf, undo, redo, canUndo, canRedo, snapshots, onSaveSnapshot, onLoadSnapshot, onDeleteSnapshot }: EditorSidebarProps) {
   const [openSection, setOpenSection] = useState<string | null>('masthead');
-  const [exportMode, setExportMode] = useState<'digital' | 'print'>('digital');
+  const [exportMode, setExportMode] = useState<'standard' | 'print' | 'pdf20'>('standard');
 
   const toggleSection = (section: string) => {
     setOpenSection(openSection === section ? null : section);
@@ -545,19 +545,30 @@ export function EditorSidebar({ state, updateState, resetState, onExportPdf, und
 
 
       <div className="p-4 bg-[#1A1A1E] border-t border-[#2C2D35] mt-auto">
-        <div className="flex gap-2 mb-3">
-          <button
-            onClick={() => setExportMode('digital')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded border ${exportMode === 'digital' ? 'bg-[#ED6A5E] text-white border-[#ED6A5E]' : 'bg-transparent text-[#8B8D98] border-[#343541] hover:border-[#4B4C56]'}`}
-          >
-            Digital (Links)
-          </button>
-          <button
-            onClick={() => setExportMode('print')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded border ${exportMode === 'print' ? 'bg-[#ED6A5E] text-white border-[#ED6A5E]' : 'bg-transparent text-[#8B8D98] border-[#343541] hover:border-[#4B4C56]'}`}
-          >
-            Print (QR/Bleed)
-          </button>
+        <div className="flex flex-col gap-2 mb-3">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setExportMode('standard')}
+              className={`flex-1 py-1.5 px-1 text-xs font-bold rounded border ${exportMode === 'standard' ? 'bg-[#ED6A5E] text-white border-[#ED6A5E]' : 'bg-transparent text-[#8B8D98] border-[#343541] hover:border-[#4B4C56]'}`}
+              title="Standard PDF (Optimized size for web/email)"
+            >
+              Digital (Std)
+            </button>
+            <button
+              onClick={() => setExportMode('print')}
+              className={`flex-1 py-1.5 px-1 text-xs font-bold rounded border ${exportMode === 'print' ? 'bg-[#ED6A5E] text-white border-[#ED6A5E]' : 'bg-transparent text-[#8B8D98] border-[#343541] hover:border-[#4B4C56]'}`}
+              title="High Resolution for Printing"
+            >
+              Print (Hi-Res)
+            </button>
+            <button
+              onClick={() => setExportMode('pdf20')}
+              className={`flex-1 py-1.5 px-1 text-xs font-bold rounded border ${exportMode === 'pdf20' ? 'bg-[#ED6A5E] text-white border-[#ED6A5E]' : 'bg-transparent text-[#8B8D98] border-[#343541] hover:border-[#4B4C56]'}`}
+              title="Maximum Quality (Lossless/PDF 2.0 structure simulation)"
+            >
+              Archival (Max)
+            </button>
+          </div>
         </div>
 
         <button

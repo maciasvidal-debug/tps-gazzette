@@ -2,7 +2,6 @@ import { expect, test, describe } from "bun:test";
 import {
   getWordCount,
   getReadingTime,
-  getFleschKincaidScore,
   getContrastRatio,
   passesWCAGAA,
 } from "./qualityMetrics";
