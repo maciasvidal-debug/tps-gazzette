@@ -1,8 +1,10 @@
 import { exportInteractiveWeb } from '../utils/webExport';
-import React, { useState } from 'react';
-import type { GazzetteState } from '../types/gazzette';
+import { useState } from 'react';
+import type { GazzetteState, Snapshot } from '../types/gazzette';
 import { AccordionSection, FormInput, FormTextArea, FormSelect } from './FormElements';
 import { ColorExtractor } from './ColorExtractor';
+import { QualityDashboard } from './editor/QualityDashboard';
+import { SnapshotsPanel } from './editor/SnapshotsPanel';
 
 interface EditorSidebarProps {
   undo?: () => void;
@@ -13,9 +15,13 @@ interface EditorSidebarProps {
   updateState: (updater: (draft: GazzetteState) => void) => void;
   resetState: () => void;
   onExportPdf: (mode?: 'digital' | 'print') => void;
+  snapshots?: Snapshot[];
+  onSaveSnapshot?: (name: string) => void;
+  onLoadSnapshot?: (id: string) => void;
+  onDeleteSnapshot?: (id: string) => void;
 }
 
-export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState, resetState, onExportPdf, undo, redo, canUndo, canRedo }) => {
+export function EditorSidebar({ state, updateState, resetState, onExportPdf, undo, redo, canUndo, canRedo, snapshots, onSaveSnapshot, onLoadSnapshot, onDeleteSnapshot }: EditorSidebarProps) {
   const [openSection, setOpenSection] = useState<string | null>('masthead');
   const [exportMode, setExportMode] = useState<'digital' | 'print'>('digital');
 
@@ -137,6 +143,22 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
             <option value="visual">Visual / Gallery</option>
           </FormSelect>
         </div>
+
+        {/* Editorial TQM Tools */}
+        <AccordionSection title="Quality Dashboard" isOpen={openSection === 'quality'} onToggle={() => toggleSection('quality')}>
+          <QualityDashboard state={state} />
+        </AccordionSection>
+
+        {snapshots && onSaveSnapshot && onLoadSnapshot && onDeleteSnapshot && (
+          <AccordionSection title="Version Control (Snapshots)" isOpen={openSection === 'snapshots'} onToggle={() => toggleSection('snapshots')}>
+            <SnapshotsPanel
+              snapshots={snapshots}
+              onSaveSnapshot={onSaveSnapshot}
+              onLoadSnapshot={onLoadSnapshot}
+              onDeleteSnapshot={onDeleteSnapshot}
+            />
+          </AccordionSection>
+        )}
 
         <AccordionSection
           title="Theme & Style"

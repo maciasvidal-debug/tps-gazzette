@@ -7,7 +7,7 @@ import { exportPdf } from './components/PdfExport';
 import { FlipbookMode } from './components/FlipbookMode';
 
 function App() {
-  const { state, updateState, resetState, undo, redo, canUndo, canRedo } = useGazzetteState();
+  const { state, updateState, resetState, undo, redo, canUndo, canRedo, snapshots, saveSnapshot, loadSnapshot, deleteSnapshot } = useGazzetteState();
 
   // Keyboard shortcuts for Time Machine
   useEffect(() => {
@@ -84,6 +84,14 @@ function App() {
         updateState={updateState} 
         resetState={resetState} 
         onExportPdf={handleExportPdf}
+        undo={undo}
+        redo={redo}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        snapshots={snapshots}
+        onSaveSnapshot={saveSnapshot}
+        onLoadSnapshot={loadSnapshot}
+        onDeleteSnapshot={deleteSnapshot}
       />
       </div>
       <div

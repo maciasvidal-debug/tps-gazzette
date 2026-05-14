@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { GazzetteState } from '../types/gazzette';
+import type { GazzetteState, Snapshot } from '../types/gazzette';
 import { logger } from '../utils/logger';
 
 const STORAGE_KEY = 'tps_gazzette_draft';
+const SNAPSHOTS_KEY = 'tps_gazzette_snapshots';
 
 const defaultState: GazzetteState = {
   themeColors: {
@@ -147,6 +148,49 @@ export function useGazzetteState() {
     }));
   }, []);
 
+  const [snapshots, setSnapshots] = useState<Snapshot[]>(() => {
+    const saved = localStorage.getItem(SNAPSHOTS_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved) as Snapshot[];
+      } catch (e) {
+        logger.error('Failed to parse saved snapshots:', e);
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(SNAPSHOTS_KEY, JSON.stringify(snapshots));
+  }, [snapshots]);
+
+  const saveSnapshot = useCallback((name: string) => {
+    setSnapshots((prev) => {
+      const newSnapshot: Snapshot = {
+        id: crypto.randomUUID(),
+        name,
+        timestamp: new Date().toISOString(),
+        state: history.present
+      };
+      return [newSnapshot, ...prev];
+    });
+  }, [history.present]);
+
+  const loadSnapshot = useCallback((id: string) => {
+    const snapshot = snapshots.find(s => s.id === id);
+    if (snapshot) {
+      setHistory((prev) => ({
+        past: [...prev.past, prev.present],
+        present: snapshot.state,
+        future: []
+      }));
+    }
+  }, [snapshots]);
+
+  const deleteSnapshot = useCallback((id: string) => {
+    setSnapshots((prev) => prev.filter(s => s.id !== id));
+  }, []);
+
   return {
     state,
     updateState,
@@ -154,6 +198,10 @@ export function useGazzetteState() {
     undo,
     redo,
     canUndo: history.past.length > 0,
-    canRedo: history.future.length > 0
+    canRedo: history.future.length > 0,
+    snapshots,
+    saveSnapshot,
+    loadSnapshot,
+    deleteSnapshot
   };
 }
