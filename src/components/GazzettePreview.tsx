@@ -233,7 +233,13 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
               className="absolute p-0"
               zIndex={box.zIndex || 20}
             >
-              <img src={box.url} alt="" className="max-w-xs pointer-events-none" />
+
+              <img
+                src={box.url}
+                alt=""
+                className={`max-w-xs pointer-events-none object-cover ${box.shape === 'circle' ? 'rounded-full aspect-square' : box.shape === 'rounded' ? 'rounded-xl' : ''} ${box.filter === 'grayscale' ? 'grayscale' : box.filter === 'sepia' ? 'sepia' : box.filter === 'blur' ? 'blur-sm' : ''}`}
+              />
+
             </MoveableWrapper>
           ))}
           {state.customTextBoxes?.filter(b => b.page === 2).map(box => (

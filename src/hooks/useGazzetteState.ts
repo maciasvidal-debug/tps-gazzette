@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { GazzetteState } from '../types/gazzette';
 import { logger } from '../utils/logger';
 
@@ -61,36 +61,99 @@ const defaultState: GazzetteState = {
 };
 
 export function useGazzetteState() {
-  const [state, setState] = useState<GazzetteState>(() => {
+  const [history, setHistory] = useState<{
+    past: GazzetteState[];
+    present: GazzetteState;
+    future: GazzetteState[];
+  }>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
-        return JSON.parse(saved) as GazzetteState;
+        return { past: [], present: JSON.parse(saved) as GazzetteState, future: [] };
       } catch (e) {
         logger.error('Failed to parse saved state:', e);
       }
     }
-    return defaultState;
+    return { past: [], present: defaultState, future: [] };
   });
+
+  const state = history.present;
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history.present));
     }, 1000);
     return () => clearTimeout(timeoutId);
-  }, [state]);
+  }, [history.present]);
 
-  const updateState = (updater: (draft: GazzetteState) => void | GazzetteState) => {
-    setState((prev) => {
-      const draft = structuredClone(prev);
+  const updateState = useCallback((updater: (draft: GazzetteState) => void | GazzetteState) => {
+    setHistory((prev) => {
+      const draft = structuredClone(prev.present);
       const result = updater(draft);
-      return (result !== undefined ? result : draft) as GazzetteState;
+      const newPresent = (result !== undefined ? result : draft) as GazzetteState;
+
+      // If no actual structural change (shallow compare of stringified version to avoid deep equal cost on every keystroke)
+      // Wait, stringify on every keystroke is expensive. We'll assume updater always means intent to change.
+
+      const newPast = [...prev.past, prev.present];
+      // Limit history to last 30 actions to save memory
+      if (newPast.length > 30) {
+          newPast.shift();
+      }
+
+      return {
+        past: newPast,
+        present: newPresent,
+        future: [] // Any new action invalidates the redo future
+      };
     });
-  };
+  }, []);
 
-  const resetState = () => {
-    setState(defaultState);
-  };
+  const undo = useCallback(() => {
+    setHistory((prev) => {
+      if (prev.past.length === 0) return prev;
 
-  return { state, updateState, resetState };
+      const previous = prev.past[prev.past.length - 1];
+      const newPast = prev.past.slice(0, prev.past.length - 1);
+
+      return {
+        past: newPast,
+        present: previous,
+        future: [prev.present, ...prev.future]
+      };
+    });
+  }, []);
+
+  const redo = useCallback(() => {
+    setHistory((prev) => {
+      if (prev.future.length === 0) return prev;
+
+      const next = prev.future[0];
+      const newFuture = prev.future.slice(1);
+
+      return {
+        past: [...prev.past, prev.present],
+        present: next,
+        future: newFuture
+      };
+    });
+  }, []);
+
+  const resetState = useCallback(() => {
+    setHistory((prev) => ({
+       past: [...prev.past, prev.present],
+       present: defaultState,
+       future: []
+    }));
+  }, []);
+
+  return {
+    state,
+    updateState,
+    resetState,
+    undo,
+    redo,
+    canUndo: history.past.length > 0,
+    canRedo: history.future.length > 0
+  };
 }

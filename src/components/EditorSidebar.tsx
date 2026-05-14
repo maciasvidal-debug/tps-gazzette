@@ -5,13 +5,17 @@ import { AccordionSection, FormInput, FormTextArea, FormSelect } from './FormEle
 import { ColorExtractor } from './ColorExtractor';
 
 interface EditorSidebarProps {
+  undo?: () => void;
+  redo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
   state: GazzetteState;
   updateState: (updater: (draft: GazzetteState) => void) => void;
   resetState: () => void;
   onExportPdf: (mode?: 'digital' | 'print') => void;
 }
 
-export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState, resetState, onExportPdf }) => {
+export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState, resetState, onExportPdf, undo, redo, canUndo, canRedo }) => {
   const [openSection, setOpenSection] = useState<string | null>('masthead');
   const [exportMode, setExportMode] = useState<'digital' | 'print'>('digital');
 
@@ -98,6 +102,29 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({ state, updateState
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar">
+
+        <div className="px-6 py-4 bg-[#1A1A1E] border-b border-[#2C2D35] flex items-center justify-between">
+          <span className="font-sans text-xs font-bold tracking-widest text-[#8B8D98] uppercase">Time Machine</span>
+          <div className="flex gap-2">
+            <button
+              onClick={undo}
+              disabled={!canUndo}
+              className={`p-1.5 rounded border ${canUndo ? 'bg-[#2A2A35] hover:bg-[#3A3A45] border-gray-600 text-white' : 'bg-[#1A1A1E] border-[#2C2D35] text-gray-600 cursor-not-allowed'}`}
+              title="Undo (Ctrl+Z)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+            </button>
+            <button
+              onClick={redo}
+              disabled={!canRedo}
+              className={`p-1.5 rounded border ${canRedo ? 'bg-[#2A2A35] hover:bg-[#3A3A45] border-gray-600 text-white' : 'bg-[#1A1A1E] border-[#2C2D35] text-gray-600 cursor-not-allowed'}`}
+              title="Redo (Ctrl+Y)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path></svg>
+            </button>
+          </div>
+        </div>
+
         {/* GLOBAL SETTINGS */}
         <div className="p-6 bg-[#1A1A1E] border-b border-[#2C2D35] mb-4">
           <FormSelect

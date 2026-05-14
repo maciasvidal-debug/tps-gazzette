@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useGazzetteState } from './hooks/useGazzetteState';
 import { EditorSidebar } from './components/EditorSidebar';
 import { AiAssistant } from './components/AiAssistant';
@@ -7,7 +7,27 @@ import { exportPdf } from './components/PdfExport';
 import { FlipbookMode } from './components/FlipbookMode';
 
 function App() {
-  const { state, updateState, resetState } = useGazzetteState();
+  const { state, updateState, resetState, undo, redo, canUndo, canRedo } = useGazzetteState();
+
+  // Keyboard shortcuts for Time Machine
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          if (canRedo) redo();
+        } else {
+          e.preventDefault();
+          if (canUndo) undo();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        if (canRedo) redo();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo, canUndo, canRedo]);
 
   const [zoom, setZoom] = useState(0.85);
   const [sidebarWidth, setSidebarWidth] = useState(384); // Default 96rem/w-96 is 384px
