@@ -3,7 +3,7 @@ import { useGazzetteState } from './hooks/useGazzetteState';
 import { EditorSidebar } from './components/EditorSidebar';
 import { AiAssistant } from './components/AiAssistant';
 import { GazzettePreview } from './components/GazzettePreview';
-import { exportPdf } from './components/PdfExport';
+import { exportPdf, type ExportMode } from './components/PdfExport';
 import { FlipbookMode } from './components/FlipbookMode';
 
 function App() {
@@ -66,7 +66,7 @@ function App() {
   }, [resize, stopResizing]);
   const [showFlipbook, setShowFlipbook] = useState(false);
 
-  const handleExportPdf = (mode: 'digital' | 'print' = 'digital') => {
+  const handleExportPdf = (mode: ExportMode = 'standard') => {
     exportPdf(state, mode);
   };
 

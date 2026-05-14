@@ -3,7 +3,9 @@ import jsPDF from 'jspdf';
 import { logger } from '../utils/logger';
 import type { GazzetteState } from '../types/gazzette';
 
-export const exportPdf = async (state: GazzetteState, mode: 'digital' | 'print' = 'digital') => {
+export type ExportMode = 'standard' | 'print' | 'pdf20';
+
+export const exportPdf = async (state: GazzetteState, mode: ExportMode = 'standard') => {
   logger.info("Starting new exact PDF export...");
 
   try {
@@ -55,25 +57,56 @@ export const exportPdf = async (state: GazzetteState, mode: 'digital' | 'print' 
     for (let i = 0; i < pages.length; i++) {
       const pageEl = pages[i];
       
+      // Determine quality settings based on mode
+      let renderScale = 2;
+      let format = 'image/jpeg';
+      let compressionQuality = 0.95;
+
+      if (mode === 'standard') {
+        renderScale = 1.5; // Good enough for digital, keeps file size low
+        compressionQuality = 0.85;
+      } else if (mode === 'print') {
+        renderScale = 4; // High resolution for print
+        compressionQuality = 1.0;
+      } else if (mode === 'pdf20') {
+        renderScale = 5; // Max resolution, simulating high-end standard
+        format = 'image/png'; // Lossless compression
+        compressionQuality = 1.0;
+      }
+
       // html2canvas configuration for best quality
       const canvas = await html2canvas(pageEl, {
-        scale: 2, // 2x resolution for better print quality
+        scale: renderScale,
         useCORS: true,
         allowTaint: true,
         logging: false,
         backgroundColor: '#FCFAF5', // tps-paper
       });
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const imgData = canvas.toDataURL(format, compressionQuality);
 
       if (i > 0) {
         pdf.addPage([1024, 1448], 'portrait');
       }
 
-      pdf.addImage(imgData, 'JPEG', 0, 0, 1024, 1448);
+      const jsPdfFormat = format === 'image/png' ? 'PNG' : 'JPEG';
+      pdf.addImage(imgData, jsPdfFormat, 0, 0, 1024, 1448);
     }
 
-    const filename = `TPS_Gazzette_${state.masthead.date.replace(/ /g, '_')}${mode === 'print' ? '_Print' : ''}.pdf`;
+    let suffix = '';
+    if (mode === 'print') suffix = '_Print';
+    if (mode === 'pdf20') suffix = '_MaxQ';
+    const filename = `TPS_Gazzette_${state.masthead.date.replace(/ /g, '_')}${suffix}.pdf`;
+
+    // Add some basic metadata to simulate professional output
+    pdf.setProperties({
+        title: `Gazzette ${state.masthead.date}`,
+        subject: 'Gazzette Export',
+        author: 'The Product Shift',
+        keywords: mode === 'pdf20' ? 'PDF 2.0, Archival, High Quality' : 'Gazzette',
+        creator: 'Gazzette Editor'
+    });
+
     pdf.save(filename);
 
     logger.info("PDF export complete.");
