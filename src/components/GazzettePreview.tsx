@@ -312,7 +312,7 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
           </div>
           
           {/* FEEL GOOD CORNER (MAIN BLOCK) */}
-          <div className="mt-8 mb-8 p-8 rounded shadow-lg border-2" style={{ backgroundColor: 'var(--color-tps-primary)', borderColor: 'var(--color-tps-accent1)' }}>
+          <div className="mt-8 p-8 rounded shadow-lg border-2" style={{ backgroundColor: 'var(--color-tps-primary)', borderColor: 'var(--color-tps-accent1)' }}>
             <div className="font-sans text-[14px] font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd"></path></svg>
               Feel Good Corner
@@ -321,6 +321,34 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
               <EditableText tagName="div" multiline value={state.feelGoodCorner || 'Time for a break! Here are some quick office hacks or trivia...'} onChange={(val) => handleUpdate(draft => { draft.feelGoodCorner = val; })} />
             </div>
           </div>
+
+          {/* ADVERTORIAL SECTION */}
+          {state.advertorial && (
+            <div className="mt-8 mb-8 p-6 border border-gray-300 bg-gray-50 flex gap-6 relative">
+              <div className="absolute top-0 right-0 bg-gray-300 text-gray-700 text-[9px] font-bold px-2 py-1 uppercase tracking-widest">
+                Sponsored Content
+              </div>
+              {state.advertorial.imageUrl && (
+                <div className="w-1/3 shrink-0">
+                  <img src={state.advertorial.imageUrl} alt="Advertorial" className="w-full h-full object-cover border border-gray-200" />
+                </div>
+              )}
+              <div className="flex-1 flex flex-col justify-center">
+                <div className="font-sans text-[10px] font-bold uppercase tracking-widest text-tps-text mb-2">
+                  <EditableText tagName="span" value={state.advertorial.company} onChange={(val) => handleUpdate(draft => { if(draft.advertorial) draft.advertorial.company = val; })} />
+                </div>
+                <EditableText tagName="h4" className="font-serif text-2xl font-bold text-tps-text mb-3 leading-snug" value={state.advertorial.headline} onChange={(val) => handleUpdate(draft => { if(draft.advertorial) draft.advertorial.headline = val; })} />
+                <div className="font-serif text-sm leading-relaxed text-gray-700 editorial-text">
+                  <EditableText tagName="div" multiline value={state.advertorial.content} onChange={(val) => handleUpdate(draft => { if(draft.advertorial) draft.advertorial.content = val; })} />
+                </div>
+                {state.advertorial.link && (
+                  <div className="mt-4 font-sans text-xs font-bold text-tps-primary uppercase tracking-widest">
+                    <a href={state.advertorial.link} target="_blank" rel="noopener noreferrer">Learn More &rarr;</a>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="mt-auto flex justify-between items-center text-[10px] text-gray-400 font-sans tracking-widest pt-4 border-t-[1px] border-gray-200 mb-8">
             <span><EditableText tagName="span" value={state.masthead.title} onChange={(val) => handleUpdate(draft => { draft.masthead.title = val; })} /></span>

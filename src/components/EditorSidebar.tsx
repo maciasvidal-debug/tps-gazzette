@@ -462,6 +462,57 @@ export function EditorSidebar({ state, updateState, resetState, onExportPdf, und
             </div>
           </div>
         </AccordionSection>
+
+        {/* ADVERTORIAL SECTION */}
+        <AccordionSection
+          title="Advertorial / Sponsored"
+          isOpen={openSection === 'advertorial'}
+          onToggle={() => toggleSection('advertorial')}
+        >
+          <div className="space-y-3">
+            <FormInput
+              label="Company Name"
+              value={state.advertorial?.company || ''}
+              onChange={e => updateState(draft => {
+                if (!draft.advertorial) draft.advertorial = { company: '', headline: '', content: '' };
+                draft.advertorial.company = e.target.value;
+              })}
+            />
+            <FormInput
+              label="Headline"
+              value={state.advertorial?.headline || ''}
+              onChange={e => updateState(draft => {
+                if (!draft.advertorial) draft.advertorial = { company: '', headline: '', content: '' };
+                draft.advertorial.headline = e.target.value;
+              })}
+            />
+            <FormTextArea
+              label="Content"
+              rows={4}
+              value={state.advertorial?.content || ''}
+              onChange={e => updateState(draft => {
+                if (!draft.advertorial) draft.advertorial = { company: '', headline: '', content: '' };
+                draft.advertorial.content = e.target.value;
+              })}
+            />
+            <FormInput
+              label="Image URL"
+              value={state.advertorial?.imageUrl || ''}
+              onChange={e => updateState(draft => {
+                if (!draft.advertorial) draft.advertorial = { company: '', headline: '', content: '' };
+                draft.advertorial.imageUrl = e.target.value;
+              })}
+            />
+            <FormInput
+              label="Link URL"
+              value={state.advertorial?.link || ''}
+              onChange={e => updateState(draft => {
+                if (!draft.advertorial) draft.advertorial = { company: '', headline: '', content: '' };
+                draft.advertorial.link = e.target.value;
+              })}
+            />
+          </div>
+        </AccordionSection>
       </div>
 
         <AccordionSection

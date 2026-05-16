@@ -58,6 +58,13 @@ const defaultState: GazzetteState = {
     kicker: "PROFILES",
     headline: "Inside the New QA Taskforce",
     content: "The newly formed Quality Assurance Taskforce brings together multidisciplinary experts to address emerging challenges in cross-departmental compliance. Their first mandate: standardizing documentation protocols across all international branches.",
+  },
+  advertorial: {
+    company: "TPS Innovations",
+    headline: "Next-Gen Analytics Software Released",
+    content: "Elevate your process control with our new suite of predictive analytics tools. Early adopters have reported a 20% increase in efficiency.",
+    imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=300&h=200",
+    link: "https://example.com/analytics"
   }
 };
 
