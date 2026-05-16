@@ -5,6 +5,7 @@ import { AccordionSection, FormInput, FormTextArea, FormSelect } from './FormEle
 import { ColorExtractor } from './ColorExtractor';
 import { QualityDashboard } from './editor/QualityDashboard';
 import { SnapshotsPanel } from './editor/SnapshotsPanel';
+import { WorkflowPanel } from './editor/WorkflowPanel';
 
 interface EditorSidebarProps {
   undo?: () => void;
@@ -145,6 +146,10 @@ export function EditorSidebar({ state, updateState, resetState, onExportPdf, und
         </div>
 
         {/* Editorial TQM Tools */}
+        <AccordionSection title="Editorial Workflow" isOpen={openSection === 'workflow'} onToggle={() => toggleSection('workflow')}>
+          <WorkflowPanel state={state} updateState={updateState} />
+        </AccordionSection>
+
         <AccordionSection title="Quality Dashboard" isOpen={openSection === 'quality'} onToggle={() => toggleSection('quality')}>
           <QualityDashboard state={state} />
         </AccordionSection>

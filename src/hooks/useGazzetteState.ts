@@ -58,7 +58,9 @@ const defaultState: GazzetteState = {
     kicker: "PROFILES",
     headline: "Inside the New QA Taskforce",
     content: "The newly formed Quality Assurance Taskforce brings together multidisciplinary experts to address emerging challenges in cross-departmental compliance. Their first mandate: standardizing documentation protocols across all international branches.",
-  }
+  },
+  workflowStatus: 'draft',
+  editorialNotes: [],
 };
 
 export function useGazzetteState() {

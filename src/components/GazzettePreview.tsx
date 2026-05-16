@@ -43,6 +43,13 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
     [state.customTextBoxes]
   );
 
+  const watermarkText = {
+    'draft': 'DRAFT',
+    'copyedit': 'IN REVIEW',
+    'layout': 'LAYOUT',
+    'approved': ''
+  }[state.workflowStatus || 'draft'];
+
   return (
     <div className="flex flex-col gap-12 items-center bg-transparent pb-16" >
       {/* PAGE 1: Front Cover / Main Story Start */}
@@ -50,6 +57,13 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
         className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0"
         id="gazzette-document-page1"
       >
+        {watermarkText && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-[100] overflow-hidden">
+            <div className="text-[150px] font-bold text-gray-400 opacity-[0.08] -rotate-45 select-none tracking-widest whitespace-nowrap">
+              {watermarkText}
+            </div>
+          </div>
+        )}
         <div className="px-12 py-10 h-full flex flex-col">
           {/* MASTHEAD */}
           <MoveableWrapper
@@ -231,6 +245,13 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
         className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0"
         id="gazzette-document-page2"
       >
+        {watermarkText && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-[100] overflow-hidden">
+            <div className="text-[150px] font-bold text-gray-400 opacity-[0.08] -rotate-45 select-none tracking-widest whitespace-nowrap">
+              {watermarkText}
+            </div>
+          </div>
+        )}
 
 
           {page2ImageBoxes.map(box => (

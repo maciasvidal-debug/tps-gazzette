@@ -101,4 +101,6 @@ export interface GazzetteState {
   freeDesignMode?: boolean;
   customTextBoxes?: CustomTextBox[];
   customImageBoxes?: CustomImageBox[];
+  workflowStatus?: 'draft' | 'copyedit' | 'layout' | 'approved';
+  editorialNotes?: { id: string; text: string; timestamp: string }[];
 }
