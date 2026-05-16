@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import type { GazzetteState, TransformState } from '../types/gazzette';
 import { Vignette } from './Vignette';
 import { MarkdownText } from './MarkdownText';
@@ -32,6 +32,16 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
   };
 
   const isFree = !!state.freeDesignMode;
+
+  const page2ImageBoxes = useMemo(() =>
+    state.customImageBoxes?.filter(b => b.page === 2) || [],
+    [state.customImageBoxes]
+  );
+
+  const page2TextBoxes = useMemo(() =>
+    state.customTextBoxes?.filter(b => b.page === 2) || [],
+    [state.customTextBoxes]
+  );
 
   return (
     <div className="flex flex-col gap-12 items-center bg-transparent pb-16" >
@@ -223,7 +233,7 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
       >
 
 
-          {state.customImageBoxes?.filter(b => b.page === 2).map(box => (
+          {page2ImageBoxes.map(box => (
             <MoveableWrapper
               key={box.id}
               id={box.id}
@@ -242,7 +252,7 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
 
             </MoveableWrapper>
           ))}
-          {state.customTextBoxes?.filter(b => b.page === 2).map(box => (
+          {page2TextBoxes.map(box => (
             <MoveableWrapper
               key={box.id}
               id={box.id}
