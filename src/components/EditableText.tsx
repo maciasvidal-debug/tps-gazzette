@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FloatingToolbar } from './editor/FloatingToolbar';
+import { sanitizeHtml } from '../utils/sanitize';
 
 interface EditableTextProps {
   value: string;
@@ -121,7 +122,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       onClick={() => setIsEditing(true)}
       className={`${className} cursor-text hover:outline hover:outline-1 hover:outline-dashed hover:outline-gray-400 transition-all`}
       title="Click to edit"
-      dangerouslySetInnerHTML={Tag === 'span' || Tag === 'div' ? { __html: value || '<span class="text-gray-400 italic">Click to enter text...</span>' } : undefined}
+      dangerouslySetInnerHTML={Tag === 'span' || Tag === 'div' ? { __html: sanitizeHtml(value || '<span class="text-gray-400 italic">Click to enter text...</span>') } : undefined}
     >
       {Tag !== 'span' && Tag !== 'div' ? (value || <span className="text-gray-400 italic">Click to enter text...</span>) : undefined}
     </Tag>
