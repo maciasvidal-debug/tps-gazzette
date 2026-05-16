@@ -4,6 +4,7 @@ import {
   getReadingTime,
   getContrastRatio,
   passesWCAGAA,
+  getFleschKincaidScore,
 } from "./qualityMetrics";
 
 describe("qualityMetrics", () => {
@@ -47,6 +48,38 @@ describe("qualityMetrics", () => {
       expect(passesWCAGAA(4.4, false)).toBe(false);
       expect(passesWCAGAA(3.0, true)).toBe(true);
       expect(passesWCAGAA(2.9, true)).toBe(false);
+    });
+  });
+
+  describe("getFleschKincaidScore", () => {
+    test("handles empty or whitespace input", () => {
+      expect(getFleschKincaidScore("")).toBe(0);
+      expect(getFleschKincaidScore("   ")).toBe(0);
+    });
+
+    test("calculates score for simple text (high score)", () => {
+      // "The cat sat on the mat." is very easy
+      expect(getFleschKincaidScore("The cat sat on the mat.")).toBe(100);
+    });
+
+    test("calculates score for complex text (low score)", () => {
+      // Very complex words and long sentence should yield low score
+      const complexText = "The comprehensive investigation revealed significant architectural vulnerabilities.";
+      expect(getFleschKincaidScore(complexText)).toBe(0);
+    });
+
+    test("calculates intermediate scores correctly", () => {
+      expect(getFleschKincaidScore("This is a sentence. This is another sentence.")).toBe(54.7);
+      expect(getFleschKincaidScore("The quick brown fox jumps over the lazy dog.")).toBe(94.3);
+    });
+
+    test("clamps the score between 0 and 100", () => {
+      // Extremely simple (should be > 100 if not clamped)
+      expect(getFleschKincaidScore("The cat.")).toBe(100);
+
+      // Extremely complex (should be < 0 if not clamped)
+      const veryComplex = "Phenomenological epistemologies notwithstanding, institutionalized compartmentalization remains problematic.";
+      expect(getFleschKincaidScore(veryComplex)).toBe(0);
     });
   });
 });
