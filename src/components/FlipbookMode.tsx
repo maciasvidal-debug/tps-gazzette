@@ -173,6 +173,34 @@ export const FlipbookMode: React.FC<Props> = ({ state, onClose }) => {
                   </div>
                </div>
 
+               {/* ADVERTORIAL SECTION */}
+               {state.advertorial && (
+                 <div className="mt-8 mb-8 p-6 border border-gray-300 bg-gray-50 flex flex-col md:flex-row gap-6 relative">
+                   <div className="absolute top-0 right-0 bg-gray-300 text-gray-700 text-[9px] font-bold px-2 py-1 uppercase tracking-widest">
+                     Sponsored Content
+                   </div>
+                   {state.advertorial.imageUrl && (
+                     <div className="w-full md:w-1/3 shrink-0">
+                       <img src={state.advertorial.imageUrl} alt="Advertorial" className="w-full h-auto object-cover border border-gray-200" />
+                     </div>
+                   )}
+                   <div className="flex-1 flex flex-col justify-center mt-4 md:mt-0">
+                     <div className="font-sans text-[10px] font-bold uppercase tracking-widest text-[#1f2937] mb-2">
+                       {state.advertorial.company}
+                     </div>
+                     <h4 className="font-serif text-2xl font-bold text-[#1f2937] mb-3 leading-snug">{state.advertorial.headline}</h4>
+                     <div className="font-serif text-sm leading-relaxed text-gray-700 editorial-text whitespace-pre-wrap">
+                       {state.advertorial.content}
+                     </div>
+                     {state.advertorial.link && (
+                       <div className="mt-4 font-sans text-xs font-bold uppercase tracking-widest" style={{ color: theme.primary }}>
+                         <a href={validateUrl(state.advertorial.link)} target="_blank" rel="noopener noreferrer">Learn More &rarr;</a>
+                       </div>
+                     )}
+                   </div>
+                 </div>
+               )}
+
             </div>
           )}
 

@@ -43,6 +43,13 @@ export interface SecondaryArticleState {
   link?: string;
 }
 
+export interface AdvertorialState {
+  company: string;
+  headline: string;
+  content: string;
+  imageUrl?: string;
+  link?: string;
+}
 
 export interface TransformState {
   translate: [number, number];
@@ -93,6 +100,7 @@ export interface GazzetteState {
   staffBox: StaffBoxState;
   secondaryArticle1: SecondaryArticleState;
   secondaryArticle2: SecondaryArticleState;
+  advertorial?: AdvertorialState;
   vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
   dropCapStyle?: 'classic' | 'ornamental';
   layoutTemplate?: 'classic' | 'modern' | 'visual';
