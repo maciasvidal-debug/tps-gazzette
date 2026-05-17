@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { GazzetteState } from '../../types/gazzette';
 import { FormSelect, FormTextArea } from '../FormElements';
+import { validateGazzette } from '../../utils/qualityMetrics';
 
 interface WorkflowPanelProps {
   state: GazzetteState;
@@ -9,6 +10,9 @@ interface WorkflowPanelProps {
 
 export function WorkflowPanel({ state, updateState }: WorkflowPanelProps) {
   const [newNote, setNewNote] = useState('');
+
+  const qualityIssues = useMemo(() => validateGazzette(state), [state]);
+  const hasCriticalErrors = qualityIssues.some(issue => issue.type === 'error');
 
   const handleAddNote = () => {
     if (!newNote.trim()) return;
@@ -33,6 +37,35 @@ export function WorkflowPanel({ state, updateState }: WorkflowPanelProps) {
 
   return (
     <div className="space-y-6">
+      {/* Pre-Flight Checklist */}
+      <div className="space-y-3">
+        <h4 className="font-bold text-[#E5E7EB] text-sm uppercase tracking-wider">Pre-Flight Checklist</h4>
+
+        {qualityIssues.length === 0 ? (
+          <div className="p-3 bg-[#1e293b] border border-[#334155] rounded flex items-center gap-2 text-sm text-[#61C554]">
+             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+             <span>All quality gates passed. Ready for approval.</span>
+          </div>
+        ) : (
+           <div className="space-y-2">
+            {qualityIssues.map((issue, idx) => (
+              <div key={idx} className={`p-3 rounded border flex items-start gap-2 text-sm ${
+                issue.type === 'error'
+                  ? 'bg-[#3f1d1d] border-[#7f1d1d] text-[#fca5a5]'
+                  : 'bg-[#422006] border-[#78350f] text-[#fcd34d]'
+              }`}>
+                {issue.type === 'error' ? (
+                  <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                ) : (
+                  <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                )}
+                <span>{issue.message}</span>
+              </div>
+            ))}
+           </div>
+        )}
+      </div>
+
       <div className="p-4 bg-[#2C2D35] rounded border border-[#1A1A1E]">
         <FormSelect
           label="Current Status"
@@ -44,8 +77,13 @@ export function WorkflowPanel({ state, updateState }: WorkflowPanelProps) {
           <option value="draft">Drafting</option>
           <option value="copyedit">Copyediting</option>
           <option value="layout">Layout & Design</option>
-          <option value="approved">Final Approved</option>
+          <option value="approved" disabled={hasCriticalErrors}>Final Approved</option>
         </FormSelect>
+        {hasCriticalErrors && (
+          <p className="text-xs text-[#ED6A5E] mt-2 italic">
+            Fix critical errors in the Pre-Flight Checklist to enable approval.
+          </p>
+        )}
       </div>
 
       <div className="space-y-3">
