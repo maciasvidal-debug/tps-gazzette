@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import type { GazzetteState } from '../../types/gazzette';
 import { FormSelect, FormTextArea } from '../FormElements';
 import { validateGazzette } from '../../utils/qualityMetrics';
+import { analyzeCopyedit, type CopyeditSuggestion } from '../../utils/aiCopilot';
 
 interface WorkflowPanelProps {
   state: GazzetteState;
@@ -10,6 +11,8 @@ interface WorkflowPanelProps {
 
 export function WorkflowPanel({ state, updateState }: WorkflowPanelProps) {
   const [newNote, setNewNote] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<CopyeditSuggestion[] | null>(null);
 
   const qualityIssues = useMemo(() => validateGazzette(state), [state]);
   const hasCriticalErrors = qualityIssues.some(issue => issue.type === 'error');
@@ -33,6 +36,20 @@ export function WorkflowPanel({ state, updateState }: WorkflowPanelProps) {
         draft.editorialNotes = draft.editorialNotes.filter((note) => note.id !== id);
       }
     });
+  };
+
+  const handleRunAiReview = async () => {
+    setIsAiLoading(true);
+    setAiSuggestions(null);
+    try {
+      const suggestions = await analyzeCopyedit(state);
+      setAiSuggestions(suggestions);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to run AI Copyedit.');
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   return (
@@ -83,6 +100,36 @@ export function WorkflowPanel({ state, updateState }: WorkflowPanelProps) {
           <p className="text-xs text-[#ED6A5E] mt-2 italic">
             Fix critical errors in the Pre-Flight Checklist to enable approval.
           </p>
+        )}
+      </div>
+
+      {/* AI Proofreader */}
+      <div className="bg-[#212126] p-4 rounded border border-[#343541]">
+        <div className="flex justify-between items-center mb-3">
+          <h4 className="font-bold text-[#E5E7EB] text-sm uppercase tracking-wider">AI Proofreader</h4>
+          <button
+            onClick={handleRunAiReview}
+            disabled={isAiLoading}
+            className="bg-[#3c2065] hover:bg-[#5e3898] disabled:opacity-50 text-white font-bold py-1 px-3 rounded text-xs transition-colors"
+          >
+            {isAiLoading ? 'Analyzing...' : 'Run Review'}
+          </button>
+        </div>
+
+        {aiSuggestions && aiSuggestions.length === 0 && (
+          <p className="text-xs text-[#61C554]">No major issues found! The text looks great.</p>
+        )}
+
+        {aiSuggestions && aiSuggestions.length > 0 && (
+          <div className="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+            {aiSuggestions.map((suggestion, idx) => (
+              <div key={idx} className="p-3 bg-[#2A2A35] rounded border border-[#4B4C56] text-sm">
+                <div className="font-bold text-[#F5BF4F] mb-1">{suggestion.location}</div>
+                <div className="text-[#E5E7EB] mb-2">{suggestion.issue}</div>
+                <div className="text-[#8B8D98] italic">Suggestion: {suggestion.suggestion}</div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

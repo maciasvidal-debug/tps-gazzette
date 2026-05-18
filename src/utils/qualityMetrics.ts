@@ -62,13 +62,46 @@ export function getContrastRatio(hex1: string, hex2: string): number {
 
     const ratio = (brightest + 0.05) / (darkest + 0.05);
     return Math.round(ratio * 100) / 100;
-  } catch (e) {
+  } catch {
     return 1; // Fallback
   }
 }
 
 export function passesWCAGAA(contrastRatio: number, isLargeText: boolean = false): boolean {
   return isLargeText ? contrastRatio >= 3.0 : contrastRatio >= 4.5;
+}
+
+export interface ToneMetrics {
+  objectivityScore: number;
+  flaggedWords: string[];
+}
+
+export function getToneMetrics(text: string): ToneMetrics {
+  if (!text.trim()) return { objectivityScore: 100, flaggedWords: [] };
+
+  const subjectiveWords = new Set([
+    'amazing', 'terrible', 'obviously', 'very', 'extremely', 'awful', 'wonderful',
+    'best', 'worst', 'fantastic', 'horrible', 'incredible', 'unbelievable',
+    'clearly', 'undoubtedly', 'absolutely', 'literally', 'naturally', 'surprisingly',
+    'luckily', 'fortunately', 'unfortunately', 'sadly', 'happily'
+  ]);
+
+  const words = text.toLowerCase().replace(/[.,!?;()]/g, '').split(/\s+/).filter(Boolean);
+  const flaggedWords: string[] = [];
+
+  words.forEach(word => {
+    if (subjectiveWords.has(word)) {
+      flaggedWords.push(word);
+    }
+  });
+
+  const uniqueFlagged = [...new Set(flaggedWords)];
+
+  // Base score 100. Deduct 2 points for each flagged occurrence, max deduction 100.
+  let objectivityScore = 100 - (flaggedWords.length * 2);
+  objectivityScore = Math.max(0, Math.min(100, objectivityScore));
+
+  return { objectivityScore, flaggedWords: uniqueFlagged };
 }
 
 export interface QualityIssue {
@@ -130,6 +163,16 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
       type: 'warning',
       message: `Readability score is very low (${score}). The text may be too complex for a general audience.`,
       field: 'readability'
+    });
+  }
+
+  // 4. Tone / Objectivity Check
+  const tone = getToneMetrics(allText);
+  if (tone.objectivityScore < 70) {
+    issues.push({
+      type: 'warning',
+      message: `Objectivity score is low (${tone.objectivityScore}). The text contains many subjective or highly charged words: ${tone.flaggedWords.slice(0, 5).join(', ')}${tone.flaggedWords.length > 5 ? '...' : ''}.`,
+      field: 'tone'
     });
   }
 

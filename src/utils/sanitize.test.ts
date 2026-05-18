@@ -7,8 +7,10 @@ class MockNode {
   childNodes: MockNode[] = [];
   parentNode: MockNode | null = null;
   textContent: string = "";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ownerDocument: any;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(nodeType: number, ownerDocument: any) {
     this.nodeType = nodeType;
     this.ownerDocument = ownerDocument;
@@ -38,6 +40,7 @@ class MockElement extends MockNode {
   tagName: string;
   attributes: Map<string, string> = new Map();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(tagName: string, ownerDocument: any) {
     super(1, ownerDocument); // ELEMENT_NODE
     this.tagName = tagName.toUpperCase();
@@ -81,6 +84,7 @@ class MockElement extends MockNode {
 }
 
 class MockDocumentFragment extends MockElement {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(ownerDocument: any) {
         super("FRAGMENT", ownerDocument);
         this.nodeType = 11; // DOCUMENT_FRAGMENT_NODE
@@ -148,7 +152,11 @@ class MockDocument {
 }
 
 class MockDOMParser {
-  parseFromString(html: string, type: string) {
+  parseFromString(html: string, type?: string) {
+    // Use type if provided to avoid unused variable warning, though it's ignored
+    if (type) {
+      // noop
+    }
     const doc = new MockDocument();
     doc.parse(html);
     return doc;
@@ -156,20 +164,30 @@ class MockDOMParser {
 }
 
 describe("sanitizeHtml", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let originalDOMParser: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let originalWindow: any;
 
   beforeAll(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     originalDOMParser = (global as any).DOMParser;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     originalWindow = (global as any).window;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).DOMParser = MockDOMParser;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).window = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).Node = MockNode;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).HTMLElement = MockElement;
   });
 
   afterAll(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).DOMParser = originalDOMParser;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).window = originalWindow;
   });
 

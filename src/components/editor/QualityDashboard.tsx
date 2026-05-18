@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { GazzetteState } from '../../types/gazzette';
-import { getWordCount, getReadingTime, getFleschKincaidScore, getContrastRatio, passesWCAGAA } from '../../utils/qualityMetrics';
+import { getWordCount, getReadingTime, getFleschKincaidScore, getContrastRatio, passesWCAGAA, getToneMetrics } from '../../utils/qualityMetrics';
 
 interface QualityDashboardProps {
   state: GazzetteState;
@@ -23,6 +23,7 @@ export function QualityDashboard({ state }: QualityDashboardProps) {
   const wordCount = getWordCount(allText);
   const readingTime = getReadingTime(allText);
   const readabilityScore = getFleschKincaidScore(allText);
+  const toneMetrics = getToneMetrics(allText);
 
   // Analyze theme colors against white paper (#FCFAF5)
   const paperColor = '#FCFAF5';
@@ -42,7 +43,7 @@ export function QualityDashboard({ state }: QualityDashboardProps) {
     <div className="space-y-4 text-sm text-[#8B8D98]">
       <div className="bg-[#212126] p-3 rounded-lg border border-[#2C2D35]">
         <h4 className="font-bold text-white mb-2 uppercase tracking-wider text-xs">Content Metrics</h4>
-        <div className="grid grid-cols-3 gap-2 text-center">
+        <div className="grid grid-cols-4 gap-2 text-center">
           <div>
             <div className="text-xl font-bold text-[#F5BF4F]">{wordCount}</div>
             <div className="text-[10px] uppercase">Words</div>
@@ -52,10 +53,20 @@ export function QualityDashboard({ state }: QualityDashboardProps) {
             <div className="text-[10px] uppercase">Min Read</div>
           </div>
           <div>
-            <div className="text-xl font-bold text-[#ED6A5E]">{readabilityScore}</div>
+            <div className="text-xl font-bold text-[#F5BF4F]">{readabilityScore}</div>
             <div className="text-[10px] uppercase">Readability</div>
           </div>
+          <div>
+            <div className={`text-xl font-bold ${toneMetrics.objectivityScore >= 70 ? 'text-[#61C554]' : 'text-[#ED6A5E]'}`}>{toneMetrics.objectivityScore}</div>
+            <div className="text-[10px] uppercase">Objectivity</div>
+          </div>
         </div>
+        {toneMetrics.flaggedWords.length > 0 && (
+          <div className="mt-3 text-[10px] border-t border-[#343541] pt-2">
+            <span className="text-white font-semibold">Flagged subjective words: </span>
+            <span className="text-[#8B8D98]">{toneMetrics.flaggedWords.join(', ')}</span>
+          </div>
+        )}
       </div>
 
       <div className="bg-[#212126] p-3 rounded-lg border border-[#2C2D35]">
