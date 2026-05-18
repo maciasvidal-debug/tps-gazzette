@@ -129,3 +129,70 @@ ${JSON.stringify({
     throw new Error("Failed to execute AI command. Please try again.", { cause: error });
   }
 };
+
+const copyeditSchema: Schema = {
+  type: SchemaType.ARRAY,
+  items: {
+    type: SchemaType.OBJECT,
+    properties: {
+      location: { type: SchemaType.STRING },
+      issue: { type: SchemaType.STRING },
+      suggestion: { type: SchemaType.STRING },
+    }
+  }
+};
+
+export interface CopyeditSuggestion {
+  location: string;
+  issue: string;
+  suggestion: string;
+}
+
+export const analyzeCopyedit = async (
+  currentState: GazzetteState
+): Promise<CopyeditSuggestion[]> => {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    throw new Error("Gemini API key is missing. Please add VITE_GEMINI_API_KEY to your .env file.");
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: copyeditSchema,
+    }
+  });
+
+  const systemInstruction = `
+You are an expert editorial proofreader.
+Review the provided newspaper content for grammatical errors, passive voice, awkward phrasing, cliches, or lack of objectivity.
+Provide actionable suggestions to improve the text.
+Return a list of specific issues found.
+
+Current Content:
+${JSON.stringify({
+  masthead: currentState.masthead,
+  featureStory: currentState.featureStory,
+  quote: currentState.quote,
+  secondaryArticle1: currentState.secondaryArticle1,
+  secondaryArticle2: currentState.secondaryArticle2,
+}, null, 2)}
+`;
+
+  const userPrompt = `Please run a copyedit analysis and return your suggestions.`;
+
+  try {
+    const result = await model.generateContent([systemInstruction, userPrompt]);
+    const responseText = result.response.text();
+    const suggestions = JSON.parse(responseText);
+
+    return suggestions as CopyeditSuggestion[];
+  } catch (error) {
+    console.error("AI Copyedit failed:", error);
+    throw new Error("Failed to run AI Copyedit. Please try again.", { cause: error });
+  }
+};
