@@ -8,7 +8,7 @@ interface QualityDashboardProps {
 
 export function QualityDashboard({ state }: QualityDashboardProps) {
   const allText = useMemo(() => {
-    return [
+    const textElements = [
       state.masthead.title,
       state.featureStory.headline,
       state.featureStory.paragraphs.join(' '),
@@ -17,7 +17,13 @@ export function QualityDashboard({ state }: QualityDashboardProps) {
       state.secondaryArticle2.headline,
       state.secondaryArticle2.content,
       state.quote.text
-    ].join(' ');
+    ];
+
+    if (state.advertorial) {
+      textElements.push(state.advertorial.headline, state.advertorial.content);
+    }
+
+    return textElements.join(' ');
   }, [state]);
 
   const wordCount = getWordCount(allText);
