@@ -146,7 +146,7 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
   }
 
   // 3. Readability Check
-  const allText = [
+  const allTextElements = [
     state.masthead.title,
     state.featureStory.headline,
     state.featureStory.paragraphs.join(' '),
@@ -155,7 +155,13 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
     state.secondaryArticle2.headline,
     state.secondaryArticle2.content,
     state.quote.text
-  ].join(' ');
+  ];
+
+  if (state.advertorial) {
+    allTextElements.push(state.advertorial.headline, state.advertorial.content);
+  }
+
+  const allText = allTextElements.join(' ');
 
   const score = getFleschKincaidScore(allText);
   if (score < 30) {

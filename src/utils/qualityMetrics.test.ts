@@ -5,7 +5,10 @@ import {
   getContrastRatio,
   passesWCAGAA,
   getFleschKincaidScore,
+  validateGazzette,
 } from "./qualityMetrics";
+
+import type { GazzetteState } from '../types/gazzette';
 
 describe("qualityMetrics", () => {
   describe("getWordCount", () => {
@@ -80,6 +83,40 @@ describe("qualityMetrics", () => {
       // Extremely complex (should be < 0 if not clamped)
       const veryComplex = "Phenomenological epistemologies notwithstanding, institutionalized compartmentalization remains problematic.";
       expect(getFleschKincaidScore(veryComplex)).toBe(0);
+    });
+  });
+
+  describe("validateGazzette", () => {
+    test("advertorial validation impacts tone metrics", () => {
+      const baseState: GazzetteState = {
+        masthead: { title: "Simple Title", date: "", volume: "", tags: [] },
+        featureStory: { kicker: "", headline: "Headline", author: "", paragraphs: ["Neutral text here."], pullQuote: "", pullQuotePosition: 0 },
+        spotlight: { imageUrl: "", caption: "", grayscale: false },
+        quote: { text: "", author: "" },
+        staffBox: { editorInChief: "", contributors: [], artDirection: "", copyright: "" },
+        secondaryArticle1: { kicker: "", headline: "", content: "" },
+        secondaryArticle2: { kicker: "", headline: "", content: "" },
+      };
+
+      // Ensure no tone warnings on the base state
+      const baseIssues = validateGazzette(baseState);
+      const baseToneIssues = baseIssues.filter(i => i.field === 'tone');
+      expect(baseToneIssues.length).toBe(0);
+
+      // Add advertorial with very subjective words
+      const stateWithAdvertorial: GazzetteState = {
+        ...baseState,
+        advertorial: {
+          company: "Acme Corp",
+          headline: "The absolute best unbelievable product! It is extremely amazing, wonderful, fantastic, and naturally the greatest!",
+          content: "We clearly, undoubtedly, literally, absolutely have the most terrible, horrible, awful competitor! Luckily, surprisingly, fortunately, our clearly best unbelievable product is extremely amazing, wonderful, fantastic, and naturally the greatest!"
+        }
+      };
+
+      const advIssues = validateGazzette(stateWithAdvertorial);
+      const advToneIssues = advIssues.filter(i => i.field === 'tone');
+      expect(advToneIssues.length).toBeGreaterThan(0);
+      expect(advToneIssues[0].message).toContain('Objectivity score is low');
     });
   });
 });
