@@ -161,6 +161,13 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
     allTextElements.push(state.advertorial.headline, state.advertorial.content);
   }
 
+  if (state.agenda) {
+    allTextElements.push(state.agenda.title);
+    state.agenda.events.forEach(event => {
+      allTextElements.push(event.title, event.description);
+    });
+  }
+
   const allText = allTextElements.join(' ');
 
   const score = getFleschKincaidScore(allText);

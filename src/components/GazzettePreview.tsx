@@ -353,6 +353,40 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
             </div>
           </div>
 
+          {/* AGENDA SECTION */}
+          {state.agenda && (
+            <div className="mt-8 mb-8">
+              <div className="border-t-2 border-b-2 border-tps-primary py-2 mb-6">
+                <EditableText
+                  tagName="h3"
+                  className="font-serif text-2xl font-bold text-center text-tps-primary uppercase tracking-widest"
+                  value={state.agenda.title}
+                  onChange={(val) => handleUpdate(draft => { if (draft.agenda) draft.agenda.title = val; })}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {state.agenda.events.length > 0 ? state.agenda.events.map((event, index) => (
+                  <div key={event.id} className="p-4 bg-gray-50 border border-gray-200 shadow-sm relative">
+                    <div className="font-sans text-xs font-bold text-tps-accent2 uppercase tracking-wider mb-1">
+                      <EditableText tagName="span" value={event.date} onChange={(val) => handleUpdate(draft => { if(draft.agenda?.events?.[index]) draft.agenda.events[index].date = val; })} />
+                    </div>
+                    <EditableText tagName="h4" className="font-serif text-lg font-bold text-tps-text mb-2 leading-tight" value={event.title} onChange={(val) => handleUpdate(draft => { if(draft.agenda?.events?.[index]) draft.agenda.events[index].title = val; })} />
+                    <div className="font-serif text-sm leading-relaxed text-gray-700 editorial-text mb-3">
+                      <EditableText tagName="div" multiline value={event.description} onChange={(val) => handleUpdate(draft => { if(draft.agenda?.events?.[index]) draft.agenda.events[index].description = val; })} />
+                    </div>
+                    {event.link && (
+                      <div className="mt-2 font-sans text-[10px] font-bold text-tps-primary uppercase tracking-widest">
+                        <a href={event.link} target="_blank" rel="noopener noreferrer">Details &rarr;</a>
+                      </div>
+                    )}
+                  </div>
+                )) : (
+                  <div className="col-span-2 text-center text-gray-400 font-serif italic text-sm py-4">No upcoming events scheduled.</div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* ADVERTORIAL SECTION */}
           {state.advertorial && (
             <div className="mt-8 mb-8 p-6 border border-gray-300 bg-gray-50 flex gap-6 relative">

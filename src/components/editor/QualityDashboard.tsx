@@ -23,6 +23,13 @@ export function QualityDashboard({ state }: QualityDashboardProps) {
       textElements.push(state.advertorial.headline, state.advertorial.content);
     }
 
+    if (state.agenda) {
+      textElements.push(state.agenda.title);
+      state.agenda.events.forEach(event => {
+        textElements.push(event.title, event.description);
+      });
+    }
+
     return textElements.join(' ');
   }, [state]);
 

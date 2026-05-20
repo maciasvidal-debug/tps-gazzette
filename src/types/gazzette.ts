@@ -43,6 +43,19 @@ export interface SecondaryArticleState {
   link?: string;
 }
 
+export interface AgendaEvent {
+  id: string;
+  title: string;
+  date: string;
+  description: string;
+  link?: string;
+}
+
+export interface AgendaState {
+  title: string;
+  events: AgendaEvent[];
+}
+
 export interface AdvertorialState {
   company: string;
   headline: string;
@@ -101,6 +114,7 @@ export interface GazzetteState {
   secondaryArticle1: SecondaryArticleState;
   secondaryArticle2: SecondaryArticleState;
   advertorial?: AdvertorialState;
+  agenda?: AgendaState;
   vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
   dropCapStyle?: 'classic' | 'ornamental';
   layoutTemplate?: 'classic' | 'modern' | 'visual';
