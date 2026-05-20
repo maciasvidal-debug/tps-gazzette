@@ -468,6 +468,96 @@ export function EditorSidebar({ state, updateState, resetState, onExportPdf, und
           </div>
         </AccordionSection>
 
+        {/* AGENDA SECTION */}
+        <AccordionSection
+          title="Corporate Agenda"
+          isOpen={openSection === 'agenda'}
+          onToggle={() => toggleSection('agenda')}
+        >
+          <div className="space-y-4">
+            <FormInput
+              label="Agenda Title"
+              value={state.agenda?.title || ''}
+              onChange={e => updateState(draft => {
+                if (!draft.agenda) draft.agenda = { title: '', events: [] };
+                draft.agenda.title = e.target.value;
+              })}
+            />
+
+            <div className="space-y-4">
+              <div className="text-sm font-bold text-[#D0D1D8] uppercase tracking-wider mb-2">Events</div>
+              {(state.agenda?.events || []).map((event, index) => (
+                <div key={event.id} className="p-3 bg-[#1A1A1E] rounded-md border border-[#343541] relative">
+                  <button
+                    className="absolute top-2 right-2 text-[#8B8D98] hover:text-[#ED6A5E]"
+                    onClick={() => updateState(draft => {
+                      if (draft.agenda?.events) {
+                        draft.agenda.events.splice(index, 1);
+                      }
+                    })}
+                  >
+                    ×
+                  </button>
+                  <div className="space-y-3 mt-4">
+                    <FormInput
+                      label="Event Title"
+                      value={event.title}
+                      onChange={e => updateState(draft => {
+                        if (draft.agenda?.events?.[index]) {
+                          draft.agenda.events[index].title = e.target.value;
+                        }
+                      })}
+                    />
+                    <FormInput
+                      label="Date/Time"
+                      value={event.date}
+                      onChange={e => updateState(draft => {
+                        if (draft.agenda?.events?.[index]) {
+                          draft.agenda.events[index].date = e.target.value;
+                        }
+                      })}
+                    />
+                    <FormTextArea
+                      label="Description"
+                      rows={2}
+                      value={event.description}
+                      onChange={e => updateState(draft => {
+                        if (draft.agenda?.events?.[index]) {
+                          draft.agenda.events[index].description = e.target.value;
+                        }
+                      })}
+                    />
+                    <FormInput
+                      label="Link (Optional)"
+                      value={event.link || ''}
+                      onChange={e => updateState(draft => {
+                        if (draft.agenda?.events?.[index]) {
+                          draft.agenda.events[index].link = e.target.value;
+                        }
+                      })}
+                    />
+                  </div>
+                </div>
+              ))}
+
+              <button
+                className="w-full py-2 bg-[#343541] hover:bg-[#4B4C56] text-[#D0D1D8] text-sm font-medium rounded transition-colors"
+                onClick={() => updateState(draft => {
+                  if (!draft.agenda) draft.agenda = { title: 'Upcoming Events', events: [] };
+                  draft.agenda.events.push({
+                    id: Date.now().toString(),
+                    title: 'New Event',
+                    date: '',
+                    description: ''
+                  });
+                })}
+              >
+                + Add Event
+              </button>
+            </div>
+          </div>
+        </AccordionSection>
+
         {/* ADVERTORIAL SECTION */}
         <AccordionSection
           title="Advertorial / Sponsored"

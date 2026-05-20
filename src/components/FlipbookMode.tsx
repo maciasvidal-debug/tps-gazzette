@@ -173,6 +173,39 @@ export const FlipbookMode: React.FC<Props> = ({ state, onClose }) => {
                   </div>
                </div>
 
+               {/* AGENDA SECTION */}
+               {state.agenda && (
+                 <div className="mt-8 mb-8">
+                   <div className="border-t-2 border-b-2 py-2 mb-6" style={{ borderColor: theme.primary }}>
+                     <h3 className="font-serif text-xl font-bold text-center uppercase tracking-widest" style={{ color: theme.primary }}>
+                       {state.agenda.title}
+                     </h3>
+                   </div>
+                   <div className="flex flex-col gap-4">
+                     {state.agenda.events.length > 0 ? state.agenda.events.map((event) => (
+                       <div key={event.id} className="p-4 bg-gray-50 border border-gray-200 shadow-sm">
+                         <div className="font-sans text-xs font-bold uppercase tracking-wider mb-1" style={{ color: theme.accent2 }}>
+                           {event.date}
+                         </div>
+                         <h4 className="font-serif text-lg font-bold text-[#1f2937] mb-2 leading-tight">
+                           {event.title}
+                         </h4>
+                         <div className="font-serif text-sm leading-relaxed text-gray-700 editorial-text mb-3 whitespace-pre-wrap">
+                           {event.description}
+                         </div>
+                         {event.link && (
+                           <div className="mt-2 font-sans text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.primary }}>
+                             <a href={validateUrl(event.link)} target="_blank" rel="noopener noreferrer">Details &rarr;</a>
+                           </div>
+                         )}
+                       </div>
+                     )) : (
+                       <div className="text-center text-gray-400 font-serif italic text-sm py-4">No upcoming events scheduled.</div>
+                     )}
+                   </div>
+                 </div>
+               )}
+
                {/* ADVERTORIAL SECTION */}
                {state.advertorial && (
                  <div className="mt-8 mb-8 p-6 border border-gray-300 bg-gray-50 flex flex-col md:flex-row gap-6 relative">

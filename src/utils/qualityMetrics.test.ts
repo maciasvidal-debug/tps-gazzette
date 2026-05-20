@@ -118,5 +118,38 @@ describe("qualityMetrics", () => {
       expect(advToneIssues.length).toBeGreaterThan(0);
       expect(advToneIssues[0].message).toContain('Objectivity score is low');
     });
+
+    test("agenda validation impacts tone metrics", () => {
+      const baseState: GazzetteState = {
+        masthead: { title: "Simple Title", date: "", volume: "", tags: [] },
+        featureStory: { kicker: "", headline: "Headline", author: "", paragraphs: ["Neutral text here."], pullQuote: "", pullQuotePosition: 0 },
+        spotlight: { imageUrl: "", caption: "", grayscale: false },
+        quote: { text: "", author: "" },
+        staffBox: { editorInChief: "", contributors: [], artDirection: "", copyright: "" },
+        secondaryArticle1: { kicker: "", headline: "", content: "" },
+        secondaryArticle2: { kicker: "", headline: "", content: "" }
+      };
+
+      // Add agenda with very subjective words
+      const stateWithAgenda: GazzetteState = {
+        ...baseState,
+        agenda: {
+          title: "Upcoming Events",
+          events: [
+            {
+              id: "1",
+              title: "The absolute best unbelievable product launch!",
+              date: "Tomorrow",
+              description: "We clearly, undoubtedly, literally, absolutely have the most terrible, horrible, awful competitor! Luckily, surprisingly, fortunately, our clearly best unbelievable event is extremely amazing, wonderful, fantastic, and naturally the greatest!"
+            }
+          ]
+        }
+      };
+
+      const agendaIssues = validateGazzette(stateWithAgenda);
+      const agendaToneIssues = agendaIssues.filter(i => i.field === 'tone');
+      expect(agendaToneIssues.length).toBeGreaterThan(0);
+      expect(agendaToneIssues[0].message).toContain('Objectivity score is low');
+    });
   });
 });
