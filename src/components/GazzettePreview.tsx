@@ -5,6 +5,7 @@ import { MarkdownText } from './MarkdownText';
 import { EditableText } from './EditableText';
 import { MoveableWrapper } from './MoveableWrapper';
 import { QRCodeSVG } from 'qrcode.react';
+import { FlashAlertPreview } from './FlashAlertPreview';
 
 interface PreviewProps {
   state: GazzetteState;
@@ -57,6 +58,7 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
         className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0"
         id="gazzette-document-page1"
       >
+        <FlashAlertPreview state={state.flashAlert} />
         {watermarkText && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-[100] overflow-hidden">
             <div className="text-[150px] font-bold text-gray-400 opacity-[0.08] -rotate-45 select-none tracking-widest whitespace-nowrap">

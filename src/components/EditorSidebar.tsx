@@ -6,6 +6,7 @@ import { ColorExtractor } from './ColorExtractor';
 import { QualityDashboard } from './editor/QualityDashboard';
 import { SnapshotsPanel } from './editor/SnapshotsPanel';
 import { WorkflowPanel } from './editor/WorkflowPanel';
+import { FlashAlertEditor } from './editor/FlashAlertEditor';
 
 interface EditorSidebarProps {
   undo?: () => void;
@@ -152,6 +153,10 @@ export function EditorSidebar({ state, updateState, resetState, onExportPdf, und
 
         <AccordionSection title="Quality Dashboard" isOpen={openSection === 'quality'} onToggle={() => toggleSection('quality')}>
           <QualityDashboard state={state} />
+        </AccordionSection>
+
+        <AccordionSection title="Flash Alert Banner" isOpen={openSection === 'flashAlert'} onToggle={() => toggleSection('flashAlert')}>
+          <FlashAlertEditor state={state} updateState={updateState} />
         </AccordionSection>
 
         {snapshots && onSaveSnapshot && onLoadSnapshot && onDeleteSnapshot && (

@@ -1,3 +1,10 @@
+export interface FlashAlertState {
+  visible: boolean;
+  message: string;
+  level: 'info' | 'warning' | 'urgent';
+  link?: string;
+}
+
 export interface MastheadState {
   title: string;
   date: string;
@@ -109,6 +116,7 @@ export interface Snapshot {
 
 export interface GazzetteState {
   feelGoodCorner?: string;
+  flashAlert?: FlashAlertState;
 
   themeColors?: {
     primary: string;
