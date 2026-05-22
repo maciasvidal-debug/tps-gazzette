@@ -168,6 +168,10 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
     });
   }
 
+  if (state.flashAlert?.visible && state.flashAlert.message) {
+    allTextElements.push(state.flashAlert.message);
+  }
+
   const allText = allTextElements.join(' ');
 
   const score = getFleschKincaidScore(allText);
@@ -187,6 +191,10 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
       message: `Objectivity score is low (${tone.objectivityScore}). The text contains many subjective or highly charged words: ${tone.flaggedWords.slice(0, 5).join(', ')}${tone.flaggedWords.length > 5 ? '...' : ''}.`,
       field: 'tone'
     });
+  }
+
+  if (state.flashAlert?.visible && !state.flashAlert.message.trim()) {
+    issues.push({ type: 'error', message: 'Flash Alert is visible but message is empty.', field: 'flashAlert' });
   }
 
   return issues;
