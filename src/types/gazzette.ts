@@ -63,6 +63,19 @@ export interface AgendaState {
   events: AgendaEvent[];
 }
 
+export interface MetricItem {
+  id: string;
+  label: string;
+  value: string;
+  trend?: 'up' | 'down' | 'neutral';
+  suffix?: string;
+}
+
+export interface MetricsState {
+  title: string;
+  items: MetricItem[];
+}
+
 export interface AdvertorialState {
   company: string;
   headline: string;
@@ -123,6 +136,7 @@ export interface GazzetteState {
   secondaryArticle2: SecondaryArticleState;
   advertorial?: AdvertorialState;
   agenda?: AgendaState;
+  metrics?: MetricsState;
   vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
   dropCapStyle?: 'classic' | 'ornamental';
   layoutTemplate?: 'classic' | 'modern' | 'visual';

@@ -30,8 +30,16 @@ export function QualityDashboard({ state }: QualityDashboardProps) {
       });
     }
 
-    if (state.flashAlert?.visible && state.flashAlert.message) {
-      textElements.push(state.flashAlert.message);
+    if (state.metrics) {
+      textElements.push(state.metrics.title);
+      state.metrics.items.forEach(item => {
+        textElements.push(item.label, item.value);
+        if (item.suffix) textElements.push(item.suffix);
+      });
+    }
+
+    if (state.feelGoodCorner) {
+      textElements.push(state.feelGoodCorner);
     }
 
     return textElements.join(' ');
