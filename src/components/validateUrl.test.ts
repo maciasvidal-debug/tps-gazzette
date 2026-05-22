@@ -50,3 +50,11 @@ describe("validateUrl", () => {
     expect(validateUrl("just-some-text")).toBe("just-some-text");
   });
 });
+
+describe("validateUrl xss", () => {
+  test("blocks javascript: protocol with control characters", () => {
+    expect(validateUrl("\x01javascript:alert(1)")).toBe("#");
+    expect(validateUrl("javascript\x01:alert(1)")).toBe("#");
+    expect(validateUrl("java\nscript:alert(1)")).toBe("#");
+  });
+});
