@@ -6,6 +6,11 @@ const STORAGE_KEY = 'tps_gazzette_draft';
 const SNAPSHOTS_KEY = 'tps_gazzette_snapshots';
 
 const defaultState: GazzetteState = {
+  flashAlert: {
+    visible: false,
+    message: '',
+    level: 'info'
+  },
   themeColors: {
     primary: '#3c2065',
     accent1: '#5e3898',

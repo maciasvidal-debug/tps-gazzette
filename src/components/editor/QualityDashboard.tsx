@@ -30,6 +30,10 @@ export function QualityDashboard({ state }: QualityDashboardProps) {
       });
     }
 
+    if (state.flashAlert?.visible && state.flashAlert.message) {
+      textElements.push(state.flashAlert.message);
+    }
+
     return textElements.join(' ');
   }, [state]);
 
