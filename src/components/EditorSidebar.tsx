@@ -558,6 +558,99 @@ export function EditorSidebar({ state, updateState, resetState, onExportPdf, und
           </div>
         </AccordionSection>
 
+        {/* METRICS SECTION */}
+        <AccordionSection
+          title="Corporate Metrics"
+          isOpen={openSection === 'metrics'}
+          onToggle={() => toggleSection('metrics')}
+        >
+          <div className="space-y-4">
+            <FormInput
+              label="Metrics Title"
+              value={state.metrics?.title || ''}
+              onChange={e => updateState(draft => {
+                if (!draft.metrics) draft.metrics = { title: '', items: [] };
+                draft.metrics.title = e.target.value;
+              })}
+            />
+
+            <div className="space-y-4">
+              <div className="text-sm font-bold text-[#D0D1D8] uppercase tracking-wider mb-2">Metrics Items</div>
+              {(state.metrics?.items || []).map((item, index) => (
+                <div key={item.id} className="p-3 bg-[#1A1A1E] rounded-md border border-[#343541] relative">
+                  <button
+                    className="absolute top-2 right-2 text-[#8B8D98] hover:text-[#ED6A5E]"
+                    onClick={() => updateState(draft => {
+                      if (draft.metrics?.items) {
+                        draft.metrics.items.splice(index, 1);
+                      }
+                    })}
+                  >
+                    ×
+                  </button>
+                  <div className="space-y-3 mt-4">
+                    <FormInput
+                      label="Label"
+                      value={item.label}
+                      onChange={e => updateState(draft => {
+                        if (draft.metrics?.items?.[index]) {
+                          draft.metrics.items[index].label = e.target.value;
+                        }
+                      })}
+                    />
+                    <FormInput
+                      label="Value"
+                      value={item.value}
+                      onChange={e => updateState(draft => {
+                        if (draft.metrics?.items?.[index]) {
+                          draft.metrics.items[index].value = e.target.value;
+                        }
+                      })}
+                    />
+                    <FormInput
+                      label="Suffix (Optional)"
+                      value={item.suffix || ''}
+                      onChange={e => updateState(draft => {
+                        if (draft.metrics?.items?.[index]) {
+                          draft.metrics.items[index].suffix = e.target.value;
+                        }
+                      })}
+                    />
+                    <FormSelect
+                      label="Trend"
+                      value={item.trend || 'neutral'}
+                      onChange={e => updateState(draft => {
+                        if (draft.metrics?.items?.[index]) {
+                          draft.metrics.items[index].trend = e.target.value as 'up' | 'down' | 'neutral';
+                        }
+                      })}
+                    >
+                      <option value="up">Up</option>
+                      <option value="down">Down</option>
+                      <option value="neutral">Neutral</option>
+                    </FormSelect>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                className="w-full py-2 bg-[#343541] hover:bg-[#4B4C56] text-[#D0D1D8] text-sm font-medium rounded transition-colors"
+                onClick={() => updateState(draft => {
+                  if (!draft.metrics) draft.metrics = { title: 'Key Performance Indicators', items: [] };
+                  draft.metrics.items.push({
+                    id: Date.now().toString(),
+                    label: 'New Metric',
+                    value: '0',
+                    trend: 'neutral'
+                  });
+                })}
+              >
+                + Add Metric
+              </button>
+            </div>
+          </div>
+        </AccordionSection>
+
         {/* ADVERTORIAL SECTION */}
         <AccordionSection
           title="Advertorial / Sponsored"

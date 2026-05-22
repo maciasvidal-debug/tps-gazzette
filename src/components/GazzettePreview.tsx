@@ -387,6 +387,42 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
             </div>
           )}
 
+          {/* METRICS SECTION */}
+          {state.metrics && (
+            <div className="mt-8 mb-8">
+              <div className="border-t-2 border-b-2 border-tps-primary py-2 mb-6">
+                <EditableText
+                  tagName="h3"
+                  className="font-serif text-2xl font-bold text-center text-tps-primary uppercase tracking-widest"
+                  value={state.metrics.title}
+                  onChange={(val) => handleUpdate(draft => { if (draft.metrics) draft.metrics.title = val; })}
+                />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {state.metrics.items.length > 0 ? state.metrics.items.map((item, index) => (
+                  <div key={item.id} className="p-4 bg-gray-50 border border-gray-200 shadow-sm text-center flex flex-col justify-center items-center h-full">
+                    <div className="font-sans text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                      <EditableText tagName="span" value={item.label} onChange={(val) => handleUpdate(draft => { if(draft.metrics?.items?.[index]) draft.metrics.items[index].label = val; })} />
+                    </div>
+                    <div className="flex items-end justify-center gap-1 mb-1">
+                      <EditableText tagName="span" className="font-serif text-3xl font-bold text-tps-primary leading-none" value={item.value} onChange={(val) => handleUpdate(draft => { if(draft.metrics?.items?.[index]) draft.metrics.items[index].value = val; })} />
+                      {item.suffix && (
+                        <EditableText tagName="span" className="font-sans text-sm font-bold text-gray-400 mb-1" value={item.suffix} onChange={(val) => handleUpdate(draft => { if(draft.metrics?.items?.[index]) draft.metrics.items[index].suffix = val; })} />
+                      )}
+                    </div>
+                    {item.trend && item.trend !== 'neutral' && (
+                      <div className={`mt-1 text-xs font-bold ${item.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                        {item.trend === 'up' ? '▲' : '▼'}
+                      </div>
+                    )}
+                  </div>
+                )) : (
+                  <div className="col-span-full text-center text-gray-400 font-serif italic text-sm py-4">No metrics to display.</div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* ADVERTORIAL SECTION */}
           {state.advertorial && (
             <div className="mt-8 mb-8 p-6 border border-gray-300 bg-gray-50 flex gap-6 relative">
