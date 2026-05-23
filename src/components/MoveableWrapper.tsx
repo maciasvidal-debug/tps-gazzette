@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Moveable from 'react-moveable';
 import type { TransformState } from '../types/gazzette';
+import { useSpatialInteraction } from '../hooks/useSpatialInteraction';
 
 interface MoveableWrapperProps {
   id: string;
@@ -44,9 +45,11 @@ export const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
     }
   }, [transform]);
 
-  const saveTransform = () => {
-    onTransformChange(id, transform);
+  const saveTransformToGlobal = (elementId: string, newTransform: TransformState) => {
+    onTransformChange(elementId, newTransform);
   };
+
+  const { handleDrag, handleScale, handleRotate } = useSpatialInteraction(saveTransformToGlobal);
 
   return (
     <>
@@ -74,15 +77,21 @@ export const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
           onDrag={e => {
             setTransform(prev => ({ ...prev, translate: e.beforeTranslate as [number, number] }));
           }}
-          onDragEnd={saveTransform}
+          onDragEnd={() => {
+            handleDrag(id, transform.translate, transform);
+          }}
           onScale={e => {
             setTransform(prev => ({ ...prev, scale: e.scale as [number, number], translate: e.drag.beforeTranslate as [number, number] }));
           }}
-          onScaleEnd={saveTransform}
+          onScaleEnd={() => {
+            handleScale(id, transform.scale, transform.translate, transform);
+          }}
           onRotate={e => {
             setTransform(prev => ({ ...prev, rotate: e.beforeRotate, translate: e.drag.beforeTranslate as [number, number] }));
           }}
-          onRotateEnd={saveTransform}
+          onRotateEnd={() => {
+            handleRotate(id, transform.rotate, transform.translate, transform);
+          }}
           // Aesthetics for the editor
           origin={false}
           renderDirections={["nw", "ne", "sw", "se"]}
