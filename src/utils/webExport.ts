@@ -1,4 +1,5 @@
 import type { GazzetteState } from '../types/gazzette';
+import { processDomForStaticExport } from './canvasRenderer';
 
 export const exportInteractiveWeb = async (state: GazzetteState) => {
   try {
@@ -25,7 +26,7 @@ export const exportInteractiveWeb = async (state: GazzetteState) => {
     }
 
     // We clone the nodes so we can clean them up without affecting the live UI
-    const clonedPages = pages.map(p => p.cloneNode(true) as HTMLElement);
+    const clonedPages = await Promise.all(pages.map(p => processDomForStaticExport(p)));
 
     // Clean up Moveable wrappers (remove borders, etc)
     clonedPages.forEach(page => {

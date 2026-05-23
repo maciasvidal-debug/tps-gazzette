@@ -197,5 +197,14 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
     issues.push({ type: 'error', message: 'Flash Alert is visible but message is empty.', field: 'flashAlert' });
   }
 
+  // 5. Canvas Export / Layout Check for Email Compliance
+  if (state.transforms && Object.keys(state.transforms).length > 0) {
+    issues.push({
+      type: 'warning',
+      message: 'Layout contains custom spatial transformations (Free Design Mode). Ensure you use the Interactive Web Export to pre-process these elements, as standard email clients do not support complex transforms.',
+      field: 'transforms'
+    });
+  }
+
   return issues;
 }

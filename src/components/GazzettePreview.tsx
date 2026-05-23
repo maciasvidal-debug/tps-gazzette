@@ -6,6 +6,7 @@ import { EditableText } from './EditableText';
 import { MoveableWrapper } from './MoveableWrapper';
 import { QRCodeSVG } from 'qrcode.react';
 import { FlashAlertPreview } from './FlashAlertPreview';
+import { CanvasOverlay } from './editor/CanvasOverlay';
 
 interface PreviewProps {
   state: GazzetteState;
@@ -53,6 +54,7 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
 
   return (
     <div className="flex flex-col gap-12 items-center bg-transparent pb-16" >
+      <CanvasOverlay isActive={isFree}>
       {/* PAGE 1: Front Cover / Main Story Start */}
       <div 
         className="w-[1024px] h-[1448px] bg-tps-paper shadow-2xl overflow-hidden relative text-tps-text flex flex-col shrink-0"
@@ -461,7 +463,7 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
 
 
             </div>
-
+      </CanvasOverlay>
       </div>
   );
 };
