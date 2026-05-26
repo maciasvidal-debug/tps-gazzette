@@ -172,6 +172,17 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
     allTextElements.push(state.flashAlert.message);
   }
 
+  if (state.feedback) {
+    if (!state.feedback.question.trim() && state.feedback.options.length > 0) {
+      issues.push({ type: 'error', message: 'Reader Feedback has options but question is empty.', field: 'feedback' });
+    }
+    allTextElements.push(state.feedback.question);
+    state.feedback.options.forEach(opt => {
+      allTextElements.push(opt.label);
+      // Not pushing the link to text element since it's just a URL, but we can check if it's safe if needed.
+    });
+  }
+
   const allText = allTextElements.join(' ');
 
   const score = getFleschKincaidScore(allText);
