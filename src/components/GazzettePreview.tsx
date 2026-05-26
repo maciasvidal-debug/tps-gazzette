@@ -391,6 +391,31 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
             </div>
           )}
 
+          {/* READER FEEDBACK SECTION */}
+          {state.feedback && (
+            <div className="mt-8 mb-8 p-6 bg-gray-100 border border-gray-200 text-center flex flex-col items-center">
+              <EditableText
+                tagName="h4"
+                className="font-sans text-lg font-bold text-tps-text mb-6 tracking-wide"
+                value={state.feedback.question}
+                onChange={(val) => handleUpdate(draft => { if(draft.feedback) draft.feedback.question = val; })}
+              />
+              <div className="flex flex-wrap justify-center gap-4">
+                {state.feedback.options.map((opt, index) => (
+                  <a
+                    key={opt.id}
+                    href={opt.link || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-white border-2 border-tps-primary text-tps-primary font-bold font-sans text-xs uppercase tracking-wider py-2 px-6 hover:bg-tps-primary hover:text-white transition-colors"
+                  >
+                    <EditableText tagName="span" value={opt.label} onChange={(val) => handleUpdate(draft => { if(draft.feedback?.options?.[index]) draft.feedback.options[index].label = val; })} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* METRICS SECTION */}
           {state.metrics && (
             <div className="mt-8 mb-8">

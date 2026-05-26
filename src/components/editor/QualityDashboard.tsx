@@ -42,6 +42,13 @@ export function QualityDashboard({ state }: QualityDashboardProps) {
       textElements.push(state.feelGoodCorner);
     }
 
+    if (state.feedback) {
+      textElements.push(state.feedback.question);
+      state.feedback.options.forEach(opt => {
+        textElements.push(opt.label);
+      });
+    }
+
     return textElements.join(' ');
   }, [state]);
 

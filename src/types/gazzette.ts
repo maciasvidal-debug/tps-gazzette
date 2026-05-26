@@ -84,6 +84,17 @@ export interface AdvertorialState {
   link?: string;
 }
 
+export interface FeedbackOption {
+  id: string;
+  label: string;
+  link: string;
+}
+
+export interface FeedbackState {
+  question: string;
+  options: FeedbackOption[];
+}
+
 export interface TransformState {
   translate: [number, number];
   rotate: number;
@@ -137,6 +148,7 @@ export interface GazzetteState {
   advertorial?: AdvertorialState;
   agenda?: AgendaState;
   metrics?: MetricsState;
+  feedback?: FeedbackState;
   vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
   dropCapStyle?: 'classic' | 'ornamental';
   layoutTemplate?: 'classic' | 'modern' | 'visual';

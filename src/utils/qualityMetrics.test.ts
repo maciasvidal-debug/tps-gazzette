@@ -151,5 +151,34 @@ describe("qualityMetrics", () => {
       expect(agendaToneIssues.length).toBeGreaterThan(0);
       expect(agendaToneIssues[0].message).toContain('Objectivity score is low');
     });
+
+    test("feedback validation impacts tone metrics", () => {
+      const baseState: GazzetteState = {
+        masthead: { title: "Simple Title", date: "", volume: "", tags: [] },
+        featureStory: { kicker: "", headline: "Headline", author: "", paragraphs: ["Neutral text here."], pullQuote: "", pullQuotePosition: 0 },
+        spotlight: { imageUrl: "", caption: "", grayscale: false },
+        quote: { text: "", author: "" },
+        staffBox: { editorInChief: "", contributors: [], artDirection: "", copyright: "" },
+        secondaryArticle1: { kicker: "", headline: "", content: "" },
+        secondaryArticle2: { kicker: "", headline: "", content: "" }
+      };
+
+      // Add feedback with very subjective words
+      const stateWithFeedback: GazzetteState = {
+        ...baseState,
+        feedback: {
+          question: "Isn't our new feature absolutely amazing and wonderful, totally incredible, unbelievably fantastic, clearly the best, incredibly awesome?",
+          options: [
+            { id: "1", label: "Yes, it is the absolute best, clearly wonderful, extremely fantastic, undeniably incredible!", link: "https://example.com/yes" },
+            { id: "2", label: "Incredible, amazing, wonderful, fantastic, unbelievable!", link: "https://example.com/incredible" }
+          ]
+        }
+      };
+
+      const feedbackIssues = validateGazzette(stateWithFeedback);
+      const feedbackToneIssues = feedbackIssues.filter(i => i.field === 'tone');
+      expect(feedbackToneIssues.length).toBeGreaterThan(0);
+      expect(feedbackToneIssues[0].message).toContain('Objectivity score is low');
+    });
   });
 });
