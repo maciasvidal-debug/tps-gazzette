@@ -107,6 +107,17 @@ export interface CustomTextBox {
   zIndex?: number;
 }
 
+export interface PollOption {
+  id: string;
+  label: string;
+}
+
+export interface PollState {
+  question: string;
+  options: PollOption[];
+  endpoint?: string;
+}
+
 export interface Snapshot {
   id: string;
   name: string;
@@ -137,6 +148,7 @@ export interface GazzetteState {
   advertorial?: AdvertorialState;
   agenda?: AgendaState;
   metrics?: MetricsState;
+  poll?: PollState;
   vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
   dropCapStyle?: 'classic' | 'ornamental';
   layoutTemplate?: 'classic' | 'modern' | 'visual';

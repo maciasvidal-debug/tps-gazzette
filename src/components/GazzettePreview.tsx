@@ -7,6 +7,7 @@ import { MoveableWrapper } from './MoveableWrapper';
 import { QRCodeSVG } from 'qrcode.react';
 import { FlashAlertPreview } from './FlashAlertPreview';
 import { CanvasOverlay } from './editor/CanvasOverlay';
+import { PollBlock } from './PollBlock';
 
 interface PreviewProps {
   state: GazzetteState;
@@ -356,6 +357,9 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
               <EditableText tagName="div" multiline value={state.feelGoodCorner || 'Time for a break! Here are some quick office hacks or trivia...'} onChange={(val) => handleUpdate(draft => { draft.feelGoodCorner = val; })} />
             </div>
           </div>
+
+          {/* INTERACTIVE POLL BLOCK */}
+          {state.poll && <PollBlock poll={state.poll} />}
 
           {/* AGENDA SECTION */}
           {state.agenda && (
