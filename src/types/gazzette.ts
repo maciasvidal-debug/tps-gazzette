@@ -95,6 +95,15 @@ export interface FeedbackState {
   options: FeedbackOption[];
 }
 
+export interface MediaHighlightState {
+  type: 'video' | 'audio';
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+  mediaUrl: string;
+  duration?: string;
+}
+
 export interface TransformState {
   translate: [number, number];
   rotate: number;
@@ -149,6 +158,7 @@ export interface GazzetteState {
   agenda?: AgendaState;
   metrics?: MetricsState;
   feedback?: FeedbackState;
+  mediaHighlight?: MediaHighlightState;
   vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
   dropCapStyle?: 'classic' | 'ornamental';
   layoutTemplate?: 'classic' | 'modern' | 'visual';

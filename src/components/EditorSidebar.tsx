@@ -473,6 +473,74 @@ export function EditorSidebar({ state, updateState, resetState, onExportPdf, und
           </div>
         </AccordionSection>
 
+        {/* MEDIA HIGHLIGHT SECTION */}
+        <AccordionSection
+          title="Media Highlight (Video/Audio)"
+          isOpen={openSection === 'mediaHighlight'}
+          onToggle={() => toggleSection('mediaHighlight')}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-[#8B8D98] uppercase tracking-wider">Enable Media</label>
+              <input
+                type="checkbox"
+                checked={!!state.mediaHighlight}
+                onChange={(e) => updateState(draft => {
+                  if (e.target.checked) {
+                    draft.mediaHighlight = {
+                      type: 'video',
+                      title: 'New Media Highlight',
+                      description: 'Description of the media content.',
+                      thumbnailUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800&h=450',
+                      mediaUrl: 'https://example.com/media'
+                    };
+                  } else {
+                    delete draft.mediaHighlight;
+                  }
+                })}
+                className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-800"
+              />
+            </div>
+            {state.mediaHighlight && (
+              <>
+                <FormSelect
+                  label="Media Type"
+                  value={state.mediaHighlight.type}
+                  onChange={e => updateState(draft => { if (draft.mediaHighlight) draft.mediaHighlight.type = e.target.value as 'video' | 'audio'; })}
+                >
+                  <option value="video">Video</option>
+                  <option value="audio">Audio</option>
+                </FormSelect>
+                <FormInput
+                  label="Title"
+                  value={state.mediaHighlight.title}
+                  onChange={e => updateState(draft => { if (draft.mediaHighlight) draft.mediaHighlight.title = e.target.value; })}
+                />
+                <FormTextArea
+                  label="Description"
+                  value={state.mediaHighlight.description}
+                  onChange={e => updateState(draft => { if (draft.mediaHighlight) draft.mediaHighlight.description = e.target.value; })}
+                />
+                <FormInput
+                  label="Thumbnail Image URL"
+                  value={state.mediaHighlight.thumbnailUrl}
+                  onChange={e => updateState(draft => { if (draft.mediaHighlight) draft.mediaHighlight.thumbnailUrl = e.target.value; })}
+                />
+                <FormInput
+                  label="Media Link URL (e.g. YouTube, intranet)"
+                  value={state.mediaHighlight.mediaUrl}
+                  onChange={e => updateState(draft => { if (draft.mediaHighlight) draft.mediaHighlight.mediaUrl = e.target.value; })}
+                />
+                <FormInput
+                  label="Duration (optional)"
+                  value={state.mediaHighlight.duration || ''}
+                  onChange={e => updateState(draft => { if (draft.mediaHighlight) draft.mediaHighlight.duration = e.target.value; })}
+                />
+              </>
+            )}
+          </div>
+        </AccordionSection>
+
         {/* AGENDA SECTION */}
         <AccordionSection
           title="Corporate Agenda"
