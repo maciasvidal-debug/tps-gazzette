@@ -82,6 +82,14 @@ const defaultState: GazzetteState = {
       }
     ]
   },
+  mediaHighlight: {
+    type: 'video',
+    title: 'Q3 All-Hands Meeting',
+    description: 'Catch up on the latest company updates and strategy discussions from our leadership team.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800&h=450',
+    mediaUrl: 'https://example.com/video/q3-all-hands',
+    duration: '45:00'
+  },
   workflowStatus: 'draft',
   editorialNotes: [],
 };

@@ -391,6 +391,30 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
             </div>
           )}
 
+          {/* MEDIA HIGHLIGHT SECTION */}
+          {state.mediaHighlight && (
+            <div className="mt-8 mb-8">
+              <div className="font-sans text-[10px] font-bold uppercase tracking-widest text-tps-text mb-4 border-b border-gray-300 pb-2 flex items-center justify-between">
+                <span>{state.mediaHighlight.type === 'video' ? 'Featured Video' : 'Featured Audio'}</span>
+                {state.mediaHighlight.duration && <span className="text-gray-500">{state.mediaHighlight.duration}</span>}
+              </div>
+              <a href={state.mediaHighlight.mediaUrl} target="_blank" rel="noopener noreferrer" className="block group relative overflow-hidden bg-gray-900 border border-gray-200">
+                <div className="aspect-video relative">
+                  <img src={state.mediaHighlight.thumbnailUrl} alt={state.mediaHighlight.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-0 h-0 border-t-8 border-b-8 border-l-[14px] border-transparent border-l-tps-primary ml-1"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4 bg-white">
+                  <EditableText tagName="h4" className="font-serif text-xl font-bold text-tps-text mb-2 leading-tight" value={state.mediaHighlight.title} onChange={(val) => handleUpdate(draft => { if (draft.mediaHighlight) draft.mediaHighlight.title = val; })} />
+                  <EditableText tagName="p" className="font-sans text-sm text-gray-600 line-clamp-2" value={state.mediaHighlight.description} onChange={(val) => handleUpdate(draft => { if (draft.mediaHighlight) draft.mediaHighlight.description = val; })} />
+                </div>
+              </a>
+            </div>
+          )}
+
           {/* READER FEEDBACK SECTION */}
           {state.feedback && (
             <div className="mt-8 mb-8 p-6 bg-gray-100 border border-gray-200 text-center flex flex-col items-center">

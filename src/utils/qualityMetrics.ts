@@ -183,6 +183,10 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
     });
   }
 
+  if (state.mediaHighlight) {
+    allTextElements.push(state.mediaHighlight.title, state.mediaHighlight.description);
+  }
+
   const allText = allTextElements.join(' ');
 
   const score = getFleschKincaidScore(allText);
