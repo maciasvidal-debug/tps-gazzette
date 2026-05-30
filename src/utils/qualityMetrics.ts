@@ -183,6 +183,19 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
     });
   }
 
+  if (state.poll) {
+    if (!state.poll.question.trim() && state.poll.options.length > 0) {
+      issues.push({ type: 'error', message: 'Interactive Poll has options but question is empty.', field: 'poll.question' });
+    }
+    if (state.poll.question.trim() && state.poll.options.length === 0) {
+      issues.push({ type: 'error', message: 'Interactive Poll has a question but no options.', field: 'poll.options' });
+    }
+    allTextElements.push(state.poll.question);
+    state.poll.options.forEach(opt => {
+      allTextElements.push(opt.label);
+    });
+  }
+
   if (state.mediaHighlight) {
     allTextElements.push(state.mediaHighlight.title, state.mediaHighlight.description);
   }
