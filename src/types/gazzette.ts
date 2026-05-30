@@ -139,6 +139,12 @@ export interface CustomTextBox {
   zIndex?: number;
 }
 
+export interface PollState {
+  question: string;
+  options: string[];
+  endpoint: string;
+}
+
 export interface Snapshot {
   id: string;
   name: string;
@@ -147,6 +153,7 @@ export interface Snapshot {
 }
 
 export interface GazzetteState {
+  poll?: PollState;
   feelGoodCorner?: string;
   flashAlert?: FlashAlertState;
 
