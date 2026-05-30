@@ -183,6 +183,22 @@ export function validateGazzette(state: GazzetteState): QualityIssue[] {
     });
   }
 
+  if (state.poll) {
+    if (!state.poll.question.trim()) {
+      issues.push({ type: 'error', message: 'Interactive Poll question is required if poll is enabled.', field: 'poll.question' });
+    }
+    if (state.poll.options.length === 0 || !state.poll.options.some(o => o.trim().length > 0)) {
+      issues.push({ type: 'error', message: 'Interactive Poll must have at least one valid option.', field: 'poll.options' });
+    }
+    if (!state.poll.endpoint.trim()) {
+      issues.push({ type: 'error', message: 'Interactive Poll requires an endpoint URL.', field: 'poll.endpoint' });
+    }
+    allTextElements.push(state.poll.question);
+    state.poll.options.forEach(opt => {
+      allTextElements.push(opt);
+    });
+  }
+
   if (state.mediaHighlight) {
     allTextElements.push(state.mediaHighlight.title, state.mediaHighlight.description);
   }

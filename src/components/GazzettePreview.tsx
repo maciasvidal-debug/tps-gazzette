@@ -7,6 +7,7 @@ import { MoveableWrapper } from './MoveableWrapper';
 import { QRCodeSVG } from 'qrcode.react';
 import { FlashAlertPreview } from './FlashAlertPreview';
 import { CanvasOverlay } from './editor/CanvasOverlay';
+import { PollBlock } from './editor/PollBlock';
 
 interface PreviewProps {
   state: GazzetteState;
@@ -413,6 +414,11 @@ export const GazzettePreview: React.FC<PreviewProps> = ({ state, updateState }) 
                 </div>
               </a>
             </div>
+          )}
+
+          {/* INTERACTIVE POLL SECTION */}
+          {state.poll && (
+            <PollBlock poll={state.poll} />
           )}
 
           {/* READER FEEDBACK SECTION */}

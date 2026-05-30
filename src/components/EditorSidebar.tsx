@@ -7,6 +7,7 @@ import { QualityDashboard } from './editor/QualityDashboard';
 import { SnapshotsPanel } from './editor/SnapshotsPanel';
 import { WorkflowPanel } from './editor/WorkflowPanel';
 import { FlashAlertEditor } from './editor/FlashAlertEditor';
+import { PollConfigPanel } from './editor/PollConfigPanel';
 
 interface EditorSidebarProps {
   undo?: () => void;
@@ -773,6 +774,15 @@ export function EditorSidebar({ state, updateState, resetState, onExportPdf, und
               })}
             />
           </div>
+        </AccordionSection>
+
+        {/* INTERACTIVE POLL SECTION */}
+        <AccordionSection
+          title="Interactive Poll"
+          isOpen={openSection === 'poll'}
+          onToggle={() => toggleSection('poll')}
+        >
+          <PollConfigPanel state={state} updateState={updateState} />
         </AccordionSection>
 
         {/* READER FEEDBACK SECTION */}
