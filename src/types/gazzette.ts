@@ -95,6 +95,18 @@ export interface FeedbackState {
   options: FeedbackOption[];
 }
 
+export interface PollOption {
+  id: string;
+  label: string;
+  link: string;
+}
+
+export interface PollState {
+  question: string;
+  options: PollOption[];
+  endpoint?: string;
+}
+
 export interface MediaHighlightState {
   type: 'video' | 'audio';
   title: string;
@@ -165,6 +177,7 @@ export interface GazzetteState {
   agenda?: AgendaState;
   metrics?: MetricsState;
   feedback?: FeedbackState;
+  poll?: PollState;
   mediaHighlight?: MediaHighlightState;
   vignetteStyle?: 'classic' | 'science' | 'writing' | 'medical';
   dropCapStyle?: 'classic' | 'ornamental';

@@ -1,15 +1,22 @@
 import { validateUrl } from './url';
-import type { PollState } from '../types/gazzette';
+import type { PollState, PollOption } from '../types/gazzette';
+import { sanitizeHtml } from './sanitize';
 
-export function sanitizePoll(poll: PollState | undefined): PollState | undefined {
+export const sanitizePollState = (poll?: Partial<PollState>): PollState | undefined => {
   if (!poll) return undefined;
 
-  const validEndpoint = validateUrl(poll.endpoint);
+  const sanitizedQuestion = poll.question ? sanitizeHtml(poll.question) : '';
+  const sanitizedEndpoint = poll.endpoint ? validateUrl(poll.endpoint) : undefined;
 
-  // Return a new object ensuring idempotency and preventing mutation of the original input.
+  const sanitizedOptions: PollOption[] = (poll.options || []).map(opt => ({
+    id: opt.id || crypto.randomUUID(),
+    label: opt.label ? sanitizeHtml(opt.label) : '',
+    link: validateUrl(opt.link || '')
+  }));
+
   return {
-    question: poll.question.replace(/<[^>]*>?/gm, '').trim(),
-    options: poll.options.map(opt => opt.replace(/<[^>]*>?/gm, '').trim()).filter(opt => opt.length > 0),
-    endpoint: validEndpoint === '#' ? '' : validEndpoint
+    question: sanitizedQuestion,
+    options: sanitizedOptions,
+    ...(sanitizedEndpoint && { endpoint: sanitizedEndpoint })
   };
-}
+};
